@@ -172,3 +172,14 @@ cython_debug/
 
 # PyPI configuration file
 .pypirc
+admin
+jazzmin
+vendor
+user_profile
+document
+migrations
+/files/static/
+node_modules
+.bolt
+medicine
+plan.md
