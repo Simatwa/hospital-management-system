@@ -42,7 +42,10 @@ class Department(models.Model):
 class Speciality(models.Model):
     name = models.CharField(max_length=50, unique=True, help_text=_("Specality name"))
     department = models.ForeignKey(
-        Department, on_delete=models.CASCADE, help_text=_("Department name")
+        Department,
+        on_delete=models.CASCADE,
+        help_text=_("Department name"),
+        related_name="specialities",
     )
     updated_at = models.DateTimeField(
         auto_now=True,
@@ -141,7 +144,7 @@ class Doctor(models.Model):
 
         @classmethod
         def choices(cls):
-            return [(key.value, key.name) for key in cls]
+            return [(key.name, key.value) for key in cls]
 
     user = models.OneToOneField(
         CustomUser,
@@ -149,10 +152,17 @@ class Doctor(models.Model):
         help_text=_("The user associated with this doctor"),
     )
     specialty = models.ForeignKey(
-        Speciality, on_delete=models.RESTRICT, help_text=_("The doctor's specialty")
+        Speciality,
+        on_delete=models.RESTRICT,
+        help_text=_("The doctor's specialty"),
+        related_name="doctors",
     )
-    working_days = models.ManyToManyField(WorkingDay, help_text=_("Working days"))
-    shift = models.CharField(max_length=40, choices=WorkShifts.choices())
+    working_days = models.ManyToManyField(
+        WorkingDay, help_text=_("Working days"), related_name="doctors"
+    )
+    shift = models.CharField(
+        max_length=40, choices=WorkShifts.choices(), default=WorkShifts.DAY.value
+    )
     salary = models.DecimalField(
         max_digits=8, decimal_places=2, help_text=_("Salary in Ksh")
     )
@@ -183,7 +193,10 @@ class Patient(models.Model):
 
 class TreatmentMedicine(models.Model):
     medicine = models.ForeignKey(
-        Medicine, on_delete=models.RESTRICT, help_text=_("Medicine given")
+        Medicine,
+        on_delete=models.RESTRICT,
+        help_text=_("Medicine given"),
+        related_name="treament_medicine",
     )
     quantity = models.IntegerField(help_text=_("Medicine amount"))
     prescription = models.TextField(help_text=_("Medicine prescription"))
@@ -207,7 +220,7 @@ class Treatment(models.Model):
 
         @classmethod
         def choices(cls):
-            return [(key.value, key.name) for key in cls]
+            return [(key.name, key.value) for key in cls]
 
     patient = models.ForeignKey(
         Patient,
@@ -221,14 +234,18 @@ class Treatment(models.Model):
         default=PatientType.OUTPATIENT.value,
         help_text=_("Select whether the patient is an outpatient or inpatient"),
     )
-    doctor = models.ManyToManyField(
-        Doctor, help_text="Doctors who administered treatment"
+    doctors = models.ManyToManyField(
+        Doctor,
+        help_text="Doctors who administered treatment",
+        related_name="treatments",
     )
     diagnosis = models.CharField(
         max_length=255, help_text=_("The diagnosis of the patient")
     )
     medicines = models.ManyToManyField(
-        TreatmentMedicine, help_text=_("Treatment medicines")
+        TreatmentMedicine,
+        help_text=_("Treatment medicines"),
+        related_name="treatments",
     )
     details = models.TextField(help_text=_("The treatment given to the patient"))
     is_complete = models.BooleanField(
@@ -257,15 +274,19 @@ class Appointment(models.Model):
 
         @classmethod
         def choices(cls):
-            return [(key.value, key.name) for key in cls]
+            return [(key.name, key.value) for key in cls]
 
     patient = models.ForeignKey(
         Patient,
         on_delete=models.CASCADE,
         help_text=_("The patient for this appointment"),
+        related_name="appointments",
     )
     doctor = models.ForeignKey(
-        Doctor, on_delete=models.CASCADE, help_text=_("The doctor for this appointment")
+        Doctor,
+        on_delete=models.CASCADE,
+        help_text=_("The doctor for this appointment"),
+        related_name="appointments",
     )
     appointment_date = models.DateTimeField(
         help_text=_("The date and time of the appointment")
@@ -274,6 +295,7 @@ class Appointment(models.Model):
     status = models.CharField(
         max_length=20,
         choices=Status.choices(),
+        default=Status.SCHEDULED.value,
         help_text=_("Select appointment status"),
     )
     updated_at = models.DateTimeField(

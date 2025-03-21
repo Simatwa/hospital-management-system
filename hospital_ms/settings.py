@@ -135,13 +135,6 @@ DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
 AUTH_USER_MODEL = "users.CustomUser"
 
-ADMIN_SITE_HEADER = "Custom Hospital Admin"
-ADMIN_SITE_TITLE = "Custom Hospital Admin"
-ADMIN_SITE_INDEX_TITLE = "Welcome to Custom Hospital Admin"
-
-ADMIN_SITE_URL = "/admin/"
-
-
 FRONTEND_DIR = None  # BASE_DIR / "frontend/dist.ready"
 
 JAZZMIN_SETTINGS = {
@@ -169,7 +162,7 @@ JAZZMIN_SETTINGS = {
         {"model": "hospital.Medicine"},
         {"app": "hospital"},
     ],
-    "search_model": ["hospital.Medicine"],
+    "search_model": ["hospital.Patient"],
     "language_chooser": True,
     "icons": {
         "auth": "fas fa-users-cog",
