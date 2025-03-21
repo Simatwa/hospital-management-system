@@ -120,7 +120,7 @@ class Payment(models.Model):
 
     user = models.ForeignKey(
         CustomUser,
-        verbose_name=_("Customer"),
+        verbose_name=_("Patient"),
         on_delete=models.CASCADE,
         help_text=_("User account to deposit to."),
         related_name="payments",

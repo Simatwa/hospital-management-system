@@ -37,7 +37,7 @@ class CustomUserAdmin(admin.ModelAdmin):
     change_password_form = AdminPasswordChangeForm
     add_form_template = "admin/auth/user/add_form.html"
     list_display = ["username", "email", "role", "location", "date_joined"]
-    list_display = ("username", "email", "is_staff")
+    # list_display = ("username", "email", "is_staff")
     list_filter = (
         "is_staff",
         "is_superuser",

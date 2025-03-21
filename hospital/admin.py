@@ -11,6 +11,8 @@ from hospital.models import (
     Appointment,
 )
 
+from django.utils.translation import gettext_lazy as _
+
 # Register your models here.
 
 
@@ -19,12 +21,12 @@ class WorkingDayAdmin(admin.ModelAdmin):
     search_fields = ("name",)
     list_filter = ("created_at",)
 
-    def total_doctors(self, obj: WorkingDay):
+    def active_doctors(self, obj: WorkingDay):
         return obj.doctors.count()
 
-    total_doctors.short_description = "Total Doctors"
+    active_doctors.short_description = "Active Doctors"
 
-    list_display = ("name", "total_doctors", "created_at")
+    list_display = ("name", "active_doctors", "created_at")
 
 
 @admin.register(Department)
@@ -45,7 +47,13 @@ class DepartmentAdmin(admin.ModelAdmin):
 class SpecialityAdmin(admin.ModelAdmin):
     search_fields = ("name", "department__name")
     list_filter = ("updated_at", "created_at")
-    list_display = ("name", "department", "updated_at", "created_at")
+    list_display = (
+        "name",
+        "department",
+        "appointment_charges",
+        "treatment_charges",
+        "updated_at",
+    )
 
 
 @admin.register(Medicine)
@@ -66,25 +74,27 @@ class MedicineAdmin(admin.ModelAdmin):
 
 @admin.register(Doctor)
 class DoctorAdmin(admin.ModelAdmin):
-    search_fields = ("user__username", "specialty__name")
-    list_filter = ("shift", "created_at")
+    search_fields = ("user__username", "speciality__name")
+    list_filter = ("shift", "speciality", "speciality__department", "created_at")
     list_editable = ("shift",)
 
-    def total_treatments(self, obj):
+    def active_treatments(self, obj):
         return obj.treatments.count()
 
-    total_treatments.short_description = "Total Treatments"
+    active_treatments.short_description = "Active Treatments"
 
-    def total_appointments(self, obj):
-        return obj.appointments.count()
+    def active_appointments(self, obj):
+        return obj.appointments.filter(
+            status=Appointment.AppointmentStatus.SCHEDULED.value
+        ).count()
 
-    total_appointments.short_description = "Total Appointments"
+    active_appointments.short_description = "Active Appointments"
     list_display = (
         "user",
-        "specialty",
+        "speciality",
         "shift",
-        "total_treatments",
-        "total_appointments",
+        "active_treatments",
+        "active_appointments",
         "created_at",
     )
 
@@ -94,11 +104,17 @@ class PatientAdmin(admin.ModelAdmin):
     search_fields = ("user__username",)
     list_filter = ("created_at",)
 
-    def total_treatments(self, obj):
+    def active_treatments(self, obj) -> int:
         return obj.treatments.count()
 
-    total_treatments.short_description = "Total Treatments"
-    list_display = ("user", "total_treatments", "created_at")
+    def pending_bill(self, obj: Patient) -> float:
+        if obj.user.account.balance < 0:
+            return abs(obj.user.account.balance)
+        else:
+            return 0
+
+    active_treatments.short_description = "Active Treatments"
+    list_display = ("user", "active_treatments", "pending_bill", "created_at")
 
 
 @admin.register(TreatmentMedicine)
@@ -110,21 +126,33 @@ class TreatmentMedicineAdmin(admin.ModelAdmin):
 
 @admin.register(Treatment)
 class TreatmentAdmin(admin.ModelAdmin):
-    def total_doctors(self, obj: Treatment):
+    def active_doctors(self, obj: Treatment):
         return obj.doctors.count()
 
-    total_doctors.short_description = "Total Doctors"
+    active_doctors.short_description = _("Active Doctors")
+
+    def total_billed(self, obj: Treatment):
+        return obj.total_bill
+
+    total_billed.short_description = _("Total billed")
     list_display = (
         "patient",
         "type",
         "diagnosis",
-        "total_doctors",
-        "is_complete",
+        "treatment_status",
+        "active_doctors",
+        "total_billed",
         "updated_at",
     )
     search_fields = ("patient__user__username", "diagnosis")
-    list_filter = ("type", "doctors", "is_complete", "updated_at", "created_at")
-    list_editable = ("is_complete",)
+    list_filter = ("type", "doctors", "treatment_status", "updated_at", "created_at")
+    fieldsets = (
+        (None, {"fields": ("patient", "type", "doctors")}),
+        (
+            _("Treatment"),
+            {"fields": ("diagnosis", "details", "medicines", "treatment_status")},
+        ),
+    )
 
 
 @admin.register(Appointment)
