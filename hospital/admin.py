@@ -21,12 +21,12 @@ class WorkingDayAdmin(admin.ModelAdmin):
     search_fields = ("name",)
     list_filter = ("created_at",)
 
-    def active_doctors(self, obj: WorkingDay):
+    def total_doctors(self, obj: WorkingDay):
         return obj.doctors.count()
 
-    active_doctors.short_description = "Active Doctors"
+    total_doctors.short_description = _("Total Doctors")
 
-    list_display = ("name", "active_doctors", "created_at")
+    list_display = ("name", "total_doctors", "created_at")
 
 
 @admin.register(Department)
@@ -38,7 +38,7 @@ class DepartmentAdmin(admin.ModelAdmin):
     def total_specialities(self, obj):
         return obj.specialities.count()
 
-    total_specialities.short_description = "Total Specialities"
+    total_specialities.short_description = _("Total Specialities")
 
     list_display = ("name", "lead", "total_specialities", "created_at")
 
@@ -62,13 +62,13 @@ class MedicineAdmin(admin.ModelAdmin):
         "name",
         "short_name",
         "category",
-        "expiry_date",
         "stock",
         "price",
-        "updated_at",
+        "expiry_date",
+        "created_at",
     )
     search_fields = ("name", "short_name", "category")
-    list_filter = ("category", "expiry_date", "updated_at", "created_at")
+    list_filter = ("category", "expiry_date", "created_at")
     list_editable = ("price", "stock")
 
 
@@ -81,14 +81,14 @@ class DoctorAdmin(admin.ModelAdmin):
     def active_treatments(self, obj):
         return obj.treatments.count()
 
-    active_treatments.short_description = "Active Treatments"
+    active_treatments.short_description = _("Active Treatments")
 
     def active_appointments(self, obj):
         return obj.appointments.filter(
-            status=Appointment.AppointmentStatus.SCHEDULED.value
+            status=Appointment.AppointmentStatus.SCHEDULED.name,
         ).count()
 
-    active_appointments.short_description = "Active Appointments"
+    active_appointments.short_description = _("Active Appointments")
     list_display = (
         "user",
         "speciality",
@@ -113,7 +113,7 @@ class PatientAdmin(admin.ModelAdmin):
         else:
             return 0
 
-    active_treatments.short_description = "Active Treatments"
+    active_treatments.short_description = _("Active Treatments")
     list_display = ("user", "active_treatments", "pending_bill", "created_at")
 
 
