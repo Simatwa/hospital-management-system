@@ -29,7 +29,7 @@ from api.v1.models import (
     DepartmentInfo,
     SpecialityInfo,
     PaymentAccountDetails,
-    SendMPESAPopTo,
+    SendMPESAPopupTo,
 )
 from pydantic import PositiveInt
 
@@ -120,6 +120,7 @@ def profile_information(patient: Annotated[Patient, Depends(get_patient)]) -> Pr
         phone_number=user.phone_number,
         email=user.email,
         location=user.location,
+        bio=user.bio,
         username=user.username,
         date_of_birth=user.date_of_birth,
         gender=user.gender,
@@ -140,7 +141,8 @@ def update_personal_info(
     user.last_name = updated_personal_data.last_name or user.last_name
     user.phone_number = updated_personal_data.phone_number or user.phone_number
     user.email = updated_personal_data.email or user.email
-    user.location = updated_personal_data.location
+    user.location = updated_personal_data.location or user.location
+    user.bio = updated_personal_data.bio or user.bio
     user.save()
     return EditablePersonalData(
         first_name=user.first_name,
@@ -527,7 +529,7 @@ def get_payment_account_details(
 
 @router.post("/send-mpesa-payment-popup", name="Send mpesa payment popup")
 def send_mpesa_popup_to(
-    patient: Annotated[Patient, Depends(get_patient)], popup_to: SendMPESAPopTo
+    patient: Annotated[Patient, Depends(get_patient)], popup_to: SendMPESAPopupTo
 ) -> Feedback:
     def send_popup(phone_number, amount):
         """To be implemented"""

@@ -102,6 +102,10 @@ class CustomUser(AbstractUser):
         help_text=_("Role of the user in the system"),
     )
 
+    bio = models.TextField(
+        null=True, blank=True, help_text=_("Relevant user information.")
+    )
+
     token = models.CharField(
         _("token"),
         help_text=_("Token for validation"),

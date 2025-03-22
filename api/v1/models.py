@@ -40,6 +40,7 @@ class EditablePersonalData(BaseModel):
     phone_number: Optional[str] = None
     email: Optional[str] = None
     location: Optional[str] = None
+    bio: Optional[str] = None
 
     class Config:
         json_schema_extra = {
@@ -49,6 +50,7 @@ class EditablePersonalData(BaseModel):
                 "phone_number": "+1234567890",
                 "email": "john.doe@example.com",
                 "location": "123 Main St, Anytown, USA",
+                "bio": "This is an example of user's description.",
             }
         }
 
@@ -71,6 +73,12 @@ class Profile(EditablePersonalData):
     class Config:
         json_schema_extra = {
             "example": {
+                "first_name": "John",
+                "last_name": "Doe",
+                "phone_number": "+1234567890",
+                "email": "john.doe@example.com",
+                "location": "123 Main St, Anytown, USA",
+                "bio": "This is an example of user's description.",
                 "username": "johndoe",
                 "date_of_birth": "1990-01-01",
                 "gender": "male",
@@ -165,7 +173,7 @@ class PatientTreatment(ShallowPatientTreatment):
                 "diagnosis": "Flu",
                 "details": "Patient has a severe flu.",
                 "treatment_status": "Inprogress",
-                "total_bill": 200.0,
+                "total_bill": 260.0,
                 "created_at": "2023-01-01T00:00:00",
                 "doctors_involved": [
                     {
@@ -381,7 +389,7 @@ class PaymentAccountDetails(BaseModel):
         }
 
 
-class SendMPESAPopTo(BaseModel):
+class SendMPESAPopupTo(BaseModel):
     phone_number: str
     amount: float
 
