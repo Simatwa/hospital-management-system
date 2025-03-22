@@ -9,9 +9,12 @@ from hospital.models import (
     TreatmentMedicine,
     Treatment,
     Appointment,
+    ExtraFee,
+    AccountDetails,
 )
 
 from django.utils.translation import gettext_lazy as _
+from django.utils import timezone
 
 # Register your models here.
 
@@ -158,6 +161,7 @@ class TreatmentAdmin(admin.ModelAdmin):
             _("Treatment"),
             {"fields": ("diagnosis", "details", "medicines", "treatment_status")},
         ),
+        (_("Fees"), {"fields": ("extra_fees",)}),
     )
 
 
@@ -174,3 +178,35 @@ class AppointmentAdmin(admin.ModelAdmin):
     search_fields = ("patient__user__username", "doctor__user__username")
     list_filter = ("status", "appointment_datetime", "updated_at", "created_at")
     list_editable = ("status",)
+
+
+@admin.register(ExtraFee)
+class ExtraFeeAdmin(admin.ModelAdmin):
+    def total_treatments_charged(self, obj: ExtraFee) -> int:
+        return obj.treatments.filter(created_at__date=timezone.now().date()).count()
+
+    total_treatments_charged.short_description = _("Today's treatments")
+
+    list_display = (
+        "name",
+        "amount",
+        "total_treatments_charged",
+        "updated_at",
+        "created_at",
+    )
+    search_fields = ("name",)
+    list_filter = ("updated_at", "created_at")
+
+
+@admin.register(AccountDetails)
+class AccountDetailsAdmin(admin.ModelAdmin):
+    list_display = (
+        "name",
+        "paybill_number",
+        "account_number",
+        "is_active",
+        "created_at",
+        "updated_at",
+    )
+    search_fields = ("name", "paybill_number")
+    list_filter = ("is_active", "created_at", "updated_at")

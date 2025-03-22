@@ -16,6 +16,36 @@ def generate_document_filepath(instance: "Medicine", filename: str) -> str:
     return f"{instance.__class__.__name__.lower()}/{filename}_{instance.id}{extension}"
 
 
+class AccountDetails(models.Model):
+    name = models.CharField(max_length=50, help_text=_("Account name e.g M-PESA"))
+    paybill_number = models.CharField(
+        max_length=100, help_text=_("Paybill number e.g 247247")
+    )
+    account_number = models.CharField(
+        max_length=100,
+        default="%(username)s",
+        help_text=_(
+            "Any or combination of %(id)d, %(username)s,%(phone_number)s, %(email)s etc"
+        ),
+    )
+    is_active = models.BooleanField(default=True, help_text=_("Account active status"))
+    details = models.TextField(
+        null=True, blank=True, help_text=_("Information related to this department.")
+    )
+    updated_at = models.DateTimeField(
+        auto_now=True,
+        verbose_name=_("Updated At"),
+    )
+    created_at = models.DateTimeField(
+        auto_now_add=True,
+        verbose_name=_("Created At"),
+        help_text=_("The date and time when the treatment was created"),
+    )
+
+    class Meta:
+        verbose_name_plural = _("Account Details")
+
+
 class WorkingDay(models.Model):
     class DaysOfWeek(Enum):
         MONDAY = "Monday"
@@ -309,6 +339,25 @@ class TreatmentMedicine(models.Model):
         super().save(*args, **kwargs)
 
 
+class ExtraFee(models.Model):
+    name = models.CharField(max_length=100, help_text=_("Fee name"))
+    details = models.TextField(help_text=_("What is this fee for?"))
+    amount = models.DecimalField(
+        max_digits=8, decimal_places=2, help_text=_("Fee amount in Ksh")
+    )
+    updated_at = models.DateTimeField(
+        auto_now=True,
+        verbose_name=_("Updated At"),
+    )
+    created_at = models.DateTimeField(
+        auto_now_add=True,
+        verbose_name=_("Created At"),
+    )
+
+    def __str__(self):
+        return f"{self.name} (Ksh.{self.amount})"
+
+
 class Treatment(models.Model):
     class PatientType(Enum):
         OUTPATIENT = "Outpatient"
@@ -354,6 +403,10 @@ class Treatment(models.Model):
     )
     details = models.TextField(help_text=_("The treatment given to the patient"))
 
+    extra_fees = models.ManyToManyField(
+        ExtraFee, help_text=_("Extra treatment fees"), related_name="treatments"
+    )
+
     treatment_status = models.CharField(
         max_length=20,
         choices=TreatmentStatus.choices(),
@@ -390,15 +443,26 @@ class Treatment(models.Model):
     @property
     def total_treatment_bill(self) -> float:
         return (
-            self.doctors.aggregate(total_charges=Sum("speciality__treatment_charges"))[
-                "total_charges"
-            ]
+            self.doctors.aggregate(
+                total_charges=Sum("speciality__treatment_charges")
+            ).get("total_charges", 0)
+            or 0
+        )
+
+    @property
+    def total_extra_fees_bill(self) -> float:
+        return (
+            self.extra_fees.aggregate(total_fees=Sum("amount")).get("total_fees", 0)
             or 0
         )
 
     @property
     def total_bill(self) -> float:
-        return self.total_medicine_bill + self.total_treatment_bill
+        return (
+            self.total_medicine_bill
+            + self.total_treatment_bill
+            + self.total_extra_fees_bill
+        )
 
     def save(self, *args, **kwargs):
         super().save(*args, **kwargs)

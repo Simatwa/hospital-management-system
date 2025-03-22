@@ -9,6 +9,7 @@ from hospital.models import (
     Doctor,
     Speciality,
     Department,
+    AccountDetails,
 )
 
 # from django.contrib.auth.hashers import check_password
@@ -27,11 +28,13 @@ from api.v1.models import (
     AvailableAppointmentWithDoctor,
     DepartmentInfo,
     SpecialityInfo,
+    PaymentAccountDetails,
+    SendMPESAPopTo,
 )
 from pydantic import PositiveInt
 
 import asyncio
-from typing import Annotated, Literal
+from typing import Annotated
 from datetime import datetime
 
 router = APIRouter(prefix="/v1", tags=["v1"])
@@ -314,6 +317,12 @@ def get_specific_treatment_details(
                 )
                 for doctor in treatment.doctors.all().order_by("-created_at")
             ]
+            treatment_dict["extra_fees"] = [
+                PatientTreatment.ExtraFees(
+                    name=fee.name, details=fee.details, amount=fee.amount
+                )
+                for fee in treatment.extra_fees.all()
+            ]
             return PatientTreatment(**treatment_dict)
         else:
             raise HTTPException(
@@ -493,3 +502,35 @@ def delete_appointment(
             status_code=status.HTTP_404_NOT_FOUND,
             detail=f"Appointment with id {id} does not exist.",
         )
+
+
+@router.get("/payment-account-details", name="Payment account details")
+def get_payment_account_details(
+    patient: Annotated[Patient, Depends(get_patient)]
+) -> list[PaymentAccountDetails]:
+    return [
+        PaymentAccountDetails(
+            name=account.name,
+            paybill_number=account.paybill_number,
+            account_number=account.account_number
+            % dict(
+                id=patient.user.id,
+                username=patient.user.username,
+                phone_number=patient.user.phone_number,
+                email=patient.user.email,
+            ),
+            details=account.details,
+        )
+        for account in AccountDetails.objects.filter(is_active=True).all()
+    ]
+
+
+@router.post("/send-mpesa-payment-popup", name="Send mpesa payment popup")
+def send_mpesa_popup_to(
+    patient: Annotated[Patient, Depends(get_patient)], popup_to: SendMPESAPopTo
+) -> Feedback:
+    def send_popup(phone_number, amount):
+        """To be implemented"""
+
+    send_popup(popup_to.phone_number, popup_to.amount)
+    return Feedback(detail="Mpesa popup sent successfully.")

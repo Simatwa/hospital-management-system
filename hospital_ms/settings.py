@@ -179,6 +179,8 @@ JAZZMIN_SETTINGS = {
         "hospital.Treatment": "fas fa-briefcase-medical",
         "hospital.Appointment": "fas fa-calendar-check",
         "hospital.TreatmentMedicine": "fas fa-capsules",
+        "hospital.ExtraFee": "fas fa-dollar-sign",
+        "hospital.AccountDetails": "fas fa-file-invoice-dollar",
     },
 }
 
