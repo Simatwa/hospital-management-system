@@ -2,22 +2,28 @@ from fastapi import APIRouter, status, HTTPException, Depends, Query, Path
 from fastapi.encoders import jsonable_encoder
 from fastapi.security.oauth2 import OAuth2PasswordBearer, OAuth2PasswordRequestForm
 from users.models import CustomUser
-from pharmacy.models import Medicine, Order
-from pharmacy.exceptions import InsufficientBalanceError
-from pydantic import PositiveInt
+from hospital.models import Patient, Treatment, Appointment, WorkingDay, Doctor
 
 # from django.contrib.auth.hashers import check_password
-from api.v1.utils import token_id, generate_token
+from api.v1.utils import token_id, generate_token, get_day_and_shift
 from api.v1.models import (
     TokenAuth,
     Profile,
     Feedback,
-    MedicineAvailable,
-    MedicineOrder,
-    ClientMedicineOrder,
+    PatientTreatment,
+    ShallowPatientTreatment,
+    EditablePersonalData,
+    AvailableDoctor,
+    DoctorDetails,
+    NewAppointmentWithDoctor,
+    UpdateAppointmentWithDoctor,
+    AvailableAppointmentWithDoctor,
 )
+from pydantic import PositiveInt
+
 import asyncio
-from typing import Annotated
+from typing import Annotated, Literal
+from datetime import datetime
 
 router = APIRouter(prefix="/v1", tags=["v1"])
 
@@ -28,14 +34,20 @@ v1_auth_scheme = OAuth2PasswordBearer(
 )
 
 
-async def get_user(token: Annotated[str, Depends(v1_auth_scheme)]) -> CustomUser:
+async def get_patient(token: Annotated[str, Depends(v1_auth_scheme)]) -> Patient:
     """Ensures token passed match the one set"""
     if token:
         try:
             if token.startswith(token_id):
 
-                def fetch_user(token):
-                    return CustomUser.objects.get(token=token)
+                def fetch_user(token) -> Patient:
+                    user = CustomUser.objects.get(token=token)
+                    try:
+                        return user.patient
+                    except CustomUser.patient.RelatedObjectDoesNotExist:
+                        new_patient = Patient.objects.create(user=user)
+                        new_patient.save()
+                        return new_patient
 
                 return await asyncio.to_thread(fetch_user, token)
 
@@ -81,170 +93,372 @@ def fetch_token(
 
 
 @router.patch("/token", name="Generate new token")
-def generate_new_token(user: Annotated[CustomUser, Depends(get_user)]) -> TokenAuth:
-    user.token = generate_token()
-    user.save()
-    return TokenAuth(access_token=user.token)
+def generate_new_token(patient: Annotated[Patient, Depends(get_patient)]) -> TokenAuth:
+    patient.user.token = generate_token()
+    patient.user.save()
+    return TokenAuth(access_token=patient.user.token)
 
 
 @router.get("/profile", name="Profile information")
-def profile_information(user: Annotated[CustomUser, Depends(get_user)]) -> Profile:
-    user_data = jsonable_encoder(user)
-    user_data["account_balance"] = user.account.balance
-    return Profile(**user_data)
+def profile_information(patient: Annotated[Patient, Depends(get_patient)]) -> Profile:
+    user = patient.user
+    return Profile(
+        first_name=user.first_name,
+        last_name=user.last_name,
+        phone_number=user.phone_number,
+        email=user.email,
+        location=user.location,
+        username=user.username,
+        date_of_birth=user.date_of_birth,
+        gender=user.gender,
+        account_balance=user.account.balance,
+        profile=user.profile.name,
+        is_staff=user.is_staff,
+        date_joined=user.date_joined,
+    )
 
 
-@router.get("/medicine", name="medicine available")
-def medicine_available(
-    name: Annotated[str, Query(description="Medicine name filter")] = None,
-    category: Annotated[
-        Medicine.MedicineCategory, Query(description="Medicine category filter")
+@router.patch("/profile", name="Update profile")
+def update_personal_info(
+    patient: Annotated[Patient, Depends(get_patient)],
+    updated_personal_data: EditablePersonalData,
+) -> EditablePersonalData:
+    user = patient.user
+    user.first_name = updated_personal_data.first_name or user.first_name
+    user.last_name = updated_personal_data.last_name or user.last_name
+    user.phone_number = updated_personal_data.phone_number or user.phone_number
+    user.email = updated_personal_data.email or user.email
+    user.location = updated_personal_data.location
+    user.save()
+    return EditablePersonalData(
+        first_name=user.first_name,
+        last_name=user.last_name,
+        phone_number=user.phone_number,
+        email=user.email,
+        location=user.location,
+    )
+
+
+"""
+Treatments
+Appointments mgt
+
+"""
+
+
+@router.get("/treatments", name="Treatments ever administered")
+def get_treatments_ever_administered(
+    patient: Annotated[Patient, Depends(get_patient)],
+    treatment_status: Annotated[
+        Treatment.TreatmentStatus, Query(description="Treatment status")
     ] = None,
-    short_name: Annotated[str, Query(description="Medicine abbreviated name")] = None,
-    price: Annotated[PositiveInt, Query(description="Medicine price filter")] = None,
+    patient_type: Annotated[
+        Treatment.PatientType, Query(description="Either Outpatient or Inpatient")
+    ] = None,
     limit: Annotated[
-        PositiveInt, Query(description="Total medicines not to exceed", ge=1, le=100)
+        PositiveInt, Query(description="Treatments amount not to exceed", gt=0, le=100)
     ] = 100,
-    offset: Annotated[int, Query(description="Medicine id to offset from")] = -1,
-) -> list[MedicineAvailable]:
-    query = Medicine.objects.order_by("-created_at")
+    offset: Annotated[
+        int, Query(description="Return treatments whose IDs are greater than this")
+    ] = -1,
+) -> list[ShallowPatientTreatment]:
 
-    if name:
-        query = query.filter(name__icontains=name)
-    if category:
-        query = query.filter(category__icontains=category.replace(" ", "_"))
-    if short_name:
-        query = query.filter(short_name__icontains=short_name)
-    if price:
-        query = query.filter(price__lt=price)
-    if offset >= 0:
-        query = query.filter(id__gt=offset)
+    treatment_list = []
+    query_filter = dict(patient=patient, id__gt=offset)
+    if treatment_status:
+        query_filter["treatment_status"] = treatment_status.value
+    if patient_type:
+        query_filter["patient_type"] = patient_type.value
+    for treatment in (
+        Treatment.objects.filter(**query_filter).all().order_by("-created_at")[:limit]
+    ):
+        treatment_dict = jsonable_encoder(treatment)
+        treatment_dict["total_bill"] = treatment.total_bill
+        treatment_list.append(ShallowPatientTreatment(**treatment_dict))
+    return treatment_list
 
-    query = query.all()[:limit]
 
-    return [MedicineAvailable(**jsonable_encoder(med)) for med in query]
-
-
-@router.get("/medicine/{medicine_id}", name="Details about a particular medicine")
-def get_specific_medicine_details(
-    medicine_id: Annotated[int, Path(description="Specific medicine id")]
-) -> MedicineAvailable:
+@router.get("/treatment/{id}", name="Get specific treatment details")
+def get_specific_treatment_details(
+    patient: Annotated[Patient, Depends(get_patient)],
+    id: Annotated[int, Path(description="Treatment ID")],
+) -> PatientTreatment:
     try:
-        target_medicine = Medicine.objects.get(id=medicine_id)
-        return MedicineAvailable(**jsonable_encoder(target_medicine))
-    except Medicine.DoesNotExist:
+        treatment = Treatment.objects.get(pk=id)
+        if treatment.patient == patient:
+            treatment_dict: dict = jsonable_encoder(treatment)
+            treatment_dict.update(
+                dict(
+                    total_medicine_bill=treatment.total_medicine_bill,
+                    total_treatment_bill=treatment.total_treatment_bill,
+                    total_bill=treatment.total_bill,
+                )
+            )
+            treatment_dict["medicines_given"] = [
+                PatientTreatment.TreatmentMedicine(
+                    medicine_name=treatment_medicine.medicine.name,
+                    quantity=treatment_medicine.quantity,
+                    prescription=treatment_medicine.prescription,
+                    price_per_medicine=treatment_medicine.medicine.price,
+                    medicine_bill=treatment_medicine.bill,
+                )
+                for treatment_medicine in treatment.medicines.all().order_by(
+                    "-created_at"
+                )
+            ]
+
+            treatment_dict["doctors_involved"] = [
+                PatientTreatment.DoctorInvolved(
+                    name=doctor.user.get_full_name(),
+                    speciality=doctor.speciality.name,
+                    speciality_treatment_charges=doctor.speciality.treatment_charges,
+                    speciality_department_name=doctor.speciality.department.name,
+                )
+                for doctor in treatment.doctors.all().order_by("-created_at")
+            ]
+            return PatientTreatment(**treatment_dict)
+        else:
+            raise HTTPException(
+                status_code=status.HTTP_403_FORBIDDEN,
+                details="You can only access your own treatment details.",
+            )
+    except Treatment.DoesNotExist:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
-            detail=f"Medicine with id {medicine_id} does not exist.",
+            detail=f"Treatment with id {id} does not exist.",
         )
 
 
-@router.post("/order/{medicine_id}", name="Place a medicine order")
-def make_medicine_order(
-    medicine_id: Annotated[int, Path(description="Medicine id")],
-    client_medicine_order: ClientMedicineOrder,
-    user: Annotated[CustomUser, Depends(get_user)],
-) -> MedicineOrder:
+@router.get("/doctors", name="Doctors available")
+def get_doctors_available(
+    at: Annotated[datetime, Query(description="Particular time filter")] = None,
+    speciality_name: Annotated[str, Query(description="Doctor speciality name")] = None,
+    limit: Annotated[
+        PositiveInt, Query(description="Doctors amount not to exceed", gt=0, le=100)
+    ] = 100,
+    offset: Annotated[
+        int, Query(description="Return doctors whose IDs are greater than this")
+    ] = -1,
+) -> list[AvailableDoctor]:
+    if at:
+        day_of_week, work_shift = get_day_and_shift(at)
+        doctors = Doctor.objects.filter(
+            working_days__name=day_of_week, shift=work_shift, id__gt=offset
+        )
+    else:
+        doctors = Doctor.objects.filter(id__gt=offset)
+    if speciality_name:
+        doctors = doctors.filter(speciality__name=speciality_name)
+    available_doctors_list: list[AvailableDoctor] = []
+    for doctor in doctors[:limit]:
+        available_doctors_list.append(
+            AvailableDoctor(
+                id=doctor.id,
+                fullname=doctor.user.get_full_name(),
+                speciality=doctor.speciality.name,
+                working_days=[
+                    day.name
+                    for day in doctor.working_days.all().order_by("-created_at")
+                ],
+                department_name=doctor.speciality.department.name,
+            )
+        )
+    return available_doctors_list
+
+
+@router.get("/doctor{id}", name="Details of specific doctor")
+def get_specific_doctor_details(
+    id: Annotated[int, Path(description="Doctor ID")]
+) -> DoctorDetails:
     try:
-        target_medicine = Medicine.objects.get(id=medicine_id)
-        new_order = Order.objects.create(
-            customer=user,
-            medicine=target_medicine,
-            quantity=client_medicine_order.quantity,
-            prescription="--",
-        )
-        new_order.save()
-        # order_response = jsonable_encoder(new_order)
-        # order_response["medicine_name"] = new_order.medicine.name
-        # This approach fails most times with error : RecursionError: maximum recursion depth exceeded
-        # return MedicineOrder(**order_response)
-        return MedicineOrder(
-            id=new_order.id,
-            medicine_name=new_order.medicine.name,
-            quantity=new_order.quantity,
-            prescription=new_order.prescription,
-            total_price=new_order.total_price,
-            status=new_order.status,
-            updated_at=new_order.updated_at,
-            created_at=new_order.created_at,
-        )
-    except Medicine.DoesNotExist:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail=f"Medicine with id {medicine_id} does not exist.",
-        )
-    except InsufficientBalanceError:
-        raise HTTPException(
-            status_code=status.HTTP_403_FORBIDDEN,
-            detail=(
-                f"You do not have enough funds to place this order. "
-                "Recharge your account and retry."
+        target_doctor = Doctor.objects.get(id=id)
+        user = target_doctor.user
+        speciality = target_doctor.speciality
+        return DoctorDetails(
+            id=target_doctor.id,
+            first_name=user.first_name,
+            last_name=user.last_name,
+            email=user.email,
+            phone_number=user.phone_number,
+            working_days=[
+                day.name
+                for day in target_doctor.working_days.all().order_by("-created_at")
+            ],
+            shift=target_doctor.shift,
+            speciality=DoctorDetails.Speciality(
+                name=speciality.name,
+                appointment_charges=speciality.appointment_charges,
+                treatment_charges=speciality.treatment_charges,
+                department_name=speciality.department.name,
             ),
         )
-
-
-@router.patch("/order/{order_id}", name="Edit an order")
-def edit_an_order(
-    order_id: Annotated[int, Path(description="Order id")],
-    client_medicine_order: ClientMedicineOrder,
-    user: Annotated[CustomUser, Depends(get_user)],
-) -> MedicineOrder:
-    try:
-        target_order = Order.objects.get(id=order_id)
-        if target_order.customer == user:
-            target_order.quantity = client_medicine_order.quantity
-            target_order.save()
-            return MedicineOrder(
-                id=target_order.id,
-                medicine_name=target_order.medicine.name,
-                quantity=target_order.quantity,
-                prescription=target_order.prescription,
-                total_price=target_order.total_price,
-                status=target_order.status,
-                updated_at=target_order.updated_at,
-                created_at=target_order.created_at,
-            )
-        else:
-            raise HTTPException(
-                status_code=status.HTTP_403_FORBIDDEN,
-                detail="You can make changes to your orders only.",
-            )
-    except Order.DoesNotExist:
+    except Doctor.DoesNotExist:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
-            detail=f"Order with id {order_id} does not exist.",
+            details=f"Doctor with id {id} does not exist.",
         )
 
 
-@router.delete("/order/{order_id}", name="Delete an order")
-def delete_an_order(
-    order_id: Annotated[int, Path(description="Order id")],
-    user: Annotated[CustomUser, Depends(get_user)],
-) -> Feedback:
+@router.get("/appointments", name="Get appointments ever set")
+def get_appointments_ever_set(
+    patient: Annotated[Patient, Depends(get_patient)],
+    status: Annotated[
+        Appointment.AppointmentStatus, Query(description="Appointment status")
+    ] = None,
+    limit: Annotated[
+        PositiveInt,
+        Query(description="Appointments amount not to exceed", gt=0, le=100),
+    ] = 100,
+    offset: Annotated[
+        int, Query(description="Return appointments whose IDs are greater than this")
+    ] = -1,
+) -> list[AvailableAppointmentWithDoctor]:
+    query_filters: dict[str, str] = dict(patient=patient, id__gt=offset)
+    if status:
+        query_filters["status"] = status.value
+    appointments = (
+        Appointment.objects.filter(**query_filters)
+        .all()
+        .order_by("-created_at")[:limit]
+    )
+    return [
+        AvailableAppointmentWithDoctor(
+            doctor_id=appointment.doctor.id,
+            appointment_datetime=appointment.appointment_datetime,
+            reason=appointment.reason,
+            id=appointment.id,
+            appointment_charges=appointment.doctor.speciality.appointment_charges,
+            status=appointment.status,
+            created_at=appointment.created_at,
+            updated_at=appointment.updated_at,
+        )
+        for appointment in appointments
+    ]
+
+
+@router.post("/appointment", name="Set new appointment")
+def set_new_appointment(
+    patient: Annotated[Patient, Depends(get_patient)],
+    new_appointment: NewAppointmentWithDoctor,
+) -> AvailableAppointmentWithDoctor:
     try:
-        target_order = Order.objects.get(id=order_id)
-        if target_order.customer == user:
-            target_order.delete()
-            return Feedback(detail="Order deleted successfully.")
+        target_doctor = Doctor.objects.get(pk=new_appointment.doctor_id)
+        if (
+            target_doctor.appointments.count()
+            >= target_doctor.speciality.appointments_limit
+        ):
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="Doctor has reached the maximum number of appointments.",
+            )
+        day_of_week, shift = get_day_and_shift(new_appointment.appointment_datetime)
+        if (
+            target_doctor.working_days.filter(name=day_of_week).exists()
+            and target_doctor.shift == shift
+        ):
+            appointment = Appointment.objects.create(
+                patient=patient,
+                doctor=target_doctor,
+                appointment_datetime=new_appointment.appointment_datetime,
+                reason=new_appointment.reason,
+            )
+            appointment.save()
+            return AvailableAppointmentWithDoctor(
+                doctor_id=appointment.doctor.id,
+                appointment_datetime=appointment.appointment_datetime,
+                reason=appointment.reason,
+                id=appointment.id,
+                appointment_charges=appointment.doctor.speciality.appointment_charges,
+                status=appointment.status,
+                created_at=appointment.created_at,
+                updated_at=appointment.updated_at,
+            )
         else:
             raise HTTPException(
-                status_code=status.HTTP_403_FORBIDDEN,
-                detail="You can delete your orders only.",
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="Doctor is not available at the given time.",
             )
-    except Order.DoesNotExist:
+    except Doctor.DoesNotExist:
         raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail=f"Order with id {order_id} does not exist.",
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail=f"Doctor with id {new_appointment.doctor_id} does not exist.",
         )
 
 
-@router.get("/orders", name="Orders already placed")
-def orders_placed(
-    user: Annotated[CustomUser, Depends(get_user)]
-) -> list[MedicineOrder]:
-    # print(user.orders)
-    orders_list = []
-    for order in Order.objects.filter(customer=user).order_by("-created_at").all():
-        order.medicine_name = order.medicine.name
-        orders_list.append(MedicineOrder.model_validate(order))
-    return orders_list
+@router.patch("/appointment/{id}", name="Update existing appointment")
+def update_existing_appointment(
+    patient: Annotated[Patient, Depends(get_patient)],
+    id: Annotated[int, Path(description="Appointment ID")],
+    updated_appointment: UpdateAppointmentWithDoctor,
+) -> AvailableAppointmentWithDoctor:
+    try:
+        appointment = Appointment.objects.get(pk=id, patient=patient)
+        target_doctor = Doctor.objects.get(
+            pk=(updated_appointment.doctor_id or appointment.doctor.id)
+        )
+        if (
+            target_doctor.appointments.count()
+            >= target_doctor.speciality.appointments_limit
+        ):
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="Doctor has reached the maximum number of appointments.",
+            )
+        day_of_week, shift = get_day_and_shift(updated_appointment.appointment_datetime)
+        if (
+            target_doctor.working_days.filter(name=day_of_week).exists()
+            and target_doctor.shift == shift
+        ):
+            appointment.doctor = target_doctor
+            appointment.appointment_datetime = (
+                updated_appointment.appointment_datetime
+                or appointment.appointment_datetime
+            )
+            appointment.reason = updated_appointment.reason or appointment.reason
+            appointment.status = updated_appointment.status or appointment.status
+            appointment.save()
+            return AvailableAppointmentWithDoctor(
+                doctor_id=appointment.doctor.id,
+                appointment_datetime=appointment.appointment_datetime,
+                reason=appointment.reason,
+                id=appointment.id,
+                appointment_charges=(
+                    appointment.doctor.speciality.appointment_charges
+                    if appointment.status != appointment.AppointmentStatus.CANCELLED
+                    else 0
+                ),
+                status=appointment.status,
+                created_at=appointment.created_at,
+                updated_at=appointment.updated_at,
+            )
+        else:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="Doctor is not available at the given time.",
+            )
+    except Appointment.DoesNotExist:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=f"Appointment with id {id} does not exist.",
+        )
+    except Doctor.DoesNotExist:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail=f"Doctor with id {updated_appointment.doctor_id} does not exist.",
+        )
+
+
+@router.delete("/appointment/{id}", name="Delete an appointment")
+def delete_appointment(
+    patient: Annotated[Patient, Depends(get_patient)],
+    id: Annotated[int, Path(description="Appointment ID")],
+) -> dict:
+    try:
+        appointment = Appointment.objects.get(pk=id, patient=patient)
+        appointment.delete()
+        return Feedback(**{"detail": "Appointment deleted successfully."})
+    except Appointment.DoesNotExist:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=f"Appointment with id {id} does not exist.",
+        )

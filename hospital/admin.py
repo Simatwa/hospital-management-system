@@ -85,7 +85,7 @@ class DoctorAdmin(admin.ModelAdmin):
 
     def active_appointments(self, obj):
         return obj.appointments.filter(
-            status=Appointment.AppointmentStatus.SCHEDULED.name,
+            status=Appointment.AppointmentStatus.SCHEDULED.value,
         ).count()
 
     active_appointments.short_description = _("Active Appointments")
@@ -137,7 +137,7 @@ class TreatmentAdmin(admin.ModelAdmin):
     total_billed.short_description = _("Total billed")
     list_display = (
         "patient",
-        "type",
+        "patient_type",
         "diagnosis",
         "treatment_status",
         "active_doctors",
@@ -145,9 +145,15 @@ class TreatmentAdmin(admin.ModelAdmin):
         "updated_at",
     )
     search_fields = ("patient__user__username", "diagnosis")
-    list_filter = ("type", "doctors", "treatment_status", "updated_at", "created_at")
+    list_filter = (
+        "patient_type",
+        "doctors",
+        "treatment_status",
+        "updated_at",
+        "created_at",
+    )
     fieldsets = (
-        (None, {"fields": ("patient", "type", "doctors")}),
+        (None, {"fields": ("patient", "patient_type", "doctors")}),
         (
             _("Treatment"),
             {"fields": ("diagnosis", "details", "medicines", "treatment_status")},
@@ -160,11 +166,11 @@ class AppointmentAdmin(admin.ModelAdmin):
     list_display = (
         "patient",
         "doctor",
-        "appointment_date",
+        "appointment_datetime",
         "status",
         "created_at",
         "updated_at",
     )
     search_fields = ("patient__user__username", "doctor__user__username")
-    list_filter = ("status", "appointment_date", "updated_at", "created_at")
+    list_filter = ("status", "appointment_datetime", "updated_at", "created_at")
     list_editable = ("status",)

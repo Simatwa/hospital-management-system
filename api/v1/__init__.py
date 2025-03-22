@@ -1,4 +1,4 @@
-"""V1 implementation of Assignment-MS
+"""V1 implementation of Hospital-MS
 """
 
 from api.v1.routes import router

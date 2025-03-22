@@ -15,7 +15,25 @@ def generate_document_filepath(instance: "Medicine", filename: str) -> str:
 
 
 class WorkingDay(models.Model):
-    name = models.CharField(max_length=30, unique=True, help_text=_("Weekday name"))
+    class DaysOfWeek(Enum):
+        MONDAY = "Monday"
+        TUESDAY = "Tuesday"
+        WEDNESDAY = "Wednesday"
+        THURSDAY = "Thursday"
+        FRIDAY = "Friday"
+        SATURDAY = "Saturday"
+        SUNDAY = "Sunday"
+
+        @classmethod
+        def choices(cls):
+            return [(key.value, key.name) for key in cls]
+
+    name = models.CharField(
+        max_length=30,
+        choices=DaysOfWeek.choices(),
+        unique=True,
+        help_text=_("Weekday name"),
+    )
     created_at = models.DateTimeField(
         auto_now_add=True,
         verbose_name=_("Created At"),
@@ -61,6 +79,9 @@ class Speciality(models.Model):
         default=0,
         help_text=_("Treatment charges in Ksh"),
     )
+    appointments_limit = models.IntegerField(
+        default=20, help_text="Daily appointments limit"
+    )
     updated_at = models.DateTimeField(
         auto_now=True,
         verbose_name=_("Updated At"),
@@ -90,7 +111,7 @@ class Medicine(models.Model):
 
         @classmethod
         def choices(cls):
-            return [(key.name, key.value) for key in cls]
+            return [(key.value, key.name) for key in cls]
 
     name = models.CharField(
         max_length=255,
@@ -152,13 +173,13 @@ class Medicine(models.Model):
 
 class Doctor(models.Model):
 
-    class WorkShifts(Enum):
+    class WorkShift(Enum):
         DAY = "Day"
         NIGHT = "Night"
 
         @classmethod
         def choices(cls):
-            return [(key.name, key.value) for key in cls]
+            return [(key.value, key.name) for key in cls]
 
     user = models.OneToOneField(
         CustomUser,
@@ -175,7 +196,7 @@ class Doctor(models.Model):
         WorkingDay, help_text=_("Working days"), related_name="doctors"
     )
     shift = models.CharField(
-        max_length=40, choices=WorkShifts.choices(), default=WorkShifts.DAY.value
+        max_length=40, choices=WorkShift.choices(), default=WorkShift.DAY.value
     )
     salary = models.DecimalField(
         max_digits=8, decimal_places=2, help_text=_("Salary in Ksh")
@@ -194,6 +215,7 @@ class Patient(models.Model):
         CustomUser,
         on_delete=models.CASCADE,
         help_text=_("The user associated with this patient"),
+        related_name="patient",
     )
     created_at = models.DateTimeField(
         auto_now_add=True,
@@ -223,6 +245,10 @@ class TreatmentMedicine(models.Model):
         verbose_name=_("Created At"),
     )
 
+    @property
+    def bill(self) -> float:
+        return self.medicine.price * self.quantity
+
     def __str__(self):
         return f"{self.medicine} - {self.quantity}"
 
@@ -245,16 +271,16 @@ class Treatment(models.Model):
 
         @classmethod
         def choices(cls):
-            return [(key.name, key.value) for key in cls]
+            return [(key.value, key.name) for key in cls]
 
     class TreatmentStatus(Enum):
-        PROGRESSING = "Progressing"
+        INPROGRESS = "Inprogress"
         HEALED = "Healed"
         REFERRED = "Referred"
 
         @classmethod
         def choices(cls):
-            return [(key.name, key.value) for key in cls]
+            return [(key.value, key.name) for key in cls]
 
     patient: Patient = models.ForeignKey(
         Patient,
@@ -262,7 +288,7 @@ class Treatment(models.Model):
         help_text=_("The patient under treatment"),
         related_name="treatments",
     )
-    type = models.CharField(
+    patient_type = models.CharField(
         max_length=20,
         choices=PatientType.choices(),
         default=PatientType.OUTPATIENT.value,
@@ -286,7 +312,7 @@ class Treatment(models.Model):
     treatment_status = models.CharField(
         max_length=20,
         choices=TreatmentStatus.choices(),
-        default=TreatmentStatus.PROGRESSING.value,
+        default=TreatmentStatus.INPROGRESS.value,
         help_text=_("Treatment status"),
     )
     bill_settled = models.DecimalField(
@@ -352,7 +378,7 @@ class Appointment(models.Model):
 
         @classmethod
         def choices(cls):
-            return [(key.name, key.value) for key in cls]
+            return [(key.value, key.name) for key in cls]
 
     patient = models.ForeignKey(
         Patient,
@@ -366,7 +392,7 @@ class Appointment(models.Model):
         help_text=_("The doctor for this appointment"),
         related_name="appointments",
     )
-    appointment_date = models.DateTimeField(
+    appointment_datetime = models.DateTimeField(
         help_text=_("The date and time of the appointment")
     )
     reason = models.TextField(help_text=_("The reason for the appointment"))
@@ -405,4 +431,4 @@ class Appointment(models.Model):
         super().save(*args, **kwargs)
 
     def __str__(self):
-        return f"{self.patient} with {self.doctor} on {self.appointment_date}"
+        return f"{self.patient} with {self.doctor} on {self.appointment_datetime}"

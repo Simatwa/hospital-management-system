@@ -9,7 +9,6 @@ from pathlib import Path
 from fastapi import FastAPI, Request, Response, Path as FPath
 from fastapi.staticfiles import StaticFiles
 from fastapi.middleware.cors import CORSMiddleware
-from typing import Annotated
 
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "hospital_ms.settings")
 import django
@@ -29,12 +28,12 @@ api_module_path = Path(__file__).parent
 api_prefix = "/api"
 
 app = FastAPI(
-    title="Assignment-Management-System API",
+    title="Hospital-Management-System API",
     version=api_module_path.joinpath("VERSION").read_text().strip(),
     description=api_module_path.joinpath("README.md").read_text(),
     license_info={
         "name": "MIT License",
-        "url": "https://raw.githubusercontent.com/Simatwa/Assignment-Management-System/refs/heads/main/LICENSE",
+        "url": "https://raw.githubusercontent.com/Simatwa/hospital-management-system/refs/heads/main/LICENSE",
     },
     docs_url="/api/docs",
     redoc_url="/api/redoc",

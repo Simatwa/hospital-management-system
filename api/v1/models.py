@@ -1,14 +1,8 @@
-from pydantic import (
-    BaseModel,
-    Field,
-    PositiveInt,
-    field_validator,
-    PositiveFloat,
-)
-from typing import Optional, Any
-from datetime import datetime
+from pydantic import BaseModel, Field, field_validator, FutureDatetime
+from typing import Optional, Any, Literal
+from datetime import datetime, date
 from hospital_ms.settings import MEDIA_URL
-from hospital.models import Medicine, Order
+from hospital.models import Treatment, WorkingDay, Doctor, Appointment
 from os import path
 
 
@@ -41,30 +35,22 @@ class Feedback(BaseModel):
     }
 
 
-class Profile(BaseModel):
-    username: str
+class EditablePersonalData(BaseModel):
     first_name: Optional[str] = None
     last_name: Optional[str] = None
+    phone_number: Optional[str] = None
     email: Optional[str] = None
     location: Optional[str] = None
+
+
+class Profile(EditablePersonalData):
+    username: str
+    date_of_birth: date
+    gender: Literal["Male", "Female", "Other"]
     account_balance: float
     profile: Optional[Any] = None
     is_staff: Optional[bool] = False
-
-    model_config = {
-        "json_schema_extra": {
-            "example": {
-                "username": "johndoe",
-                "first_name": "John",
-                "last_name": "Doe",
-                "email": "johndoe@example.com",
-                "location": "Nairobi",
-                "account_balance": 1200.15,
-                "profile": "/media/profiles/johndoe.jpg",
-                "is_staff": False,
-            }
-        }
-    }
+    date_joined: datetime
 
     @field_validator("profile")
     def validate_file(value):
@@ -73,73 +59,81 @@ class Profile(BaseModel):
         return value
 
 
-class MedicineAvailable(BaseModel):
+class ShallowPatientTreatment(BaseModel):
     id: int
-    name: str
-    short_name: str | None = None
-    category: Medicine.MedicineCategory | str
-    description: str
-    price: PositiveFloat
-    stock: PositiveInt
-    picture: str
-    updated_at: datetime
-
-    model_config = {
-        "json_schema_extra": {
-            "example": {
-                "id": 1,
-                "name": "Aspirin",
-                "short_name": "ASP",
-                "category": "Pain Relief",
-                "description": "Used to reduce pain, fever, or inflammation.",
-                "price": 5.99,
-                "stock": 100,
-                "picture": "/media/medicines/aspirin.jpg",
-                "updated_at": "2023-10-01T12:00:00",
-            }
-        }
-    }
-
-    @field_validator("picture")
-    def validate_file(value):
-        if value:
-            return path.join(MEDIA_URL, value)
-        return value
-
-
-class ClientMedicineOrder(BaseModel):
-    quantity: PositiveInt
-
-    model_config = {
-        "json_schema_extra": {
-            "example": {
-                "quantity": 2,
-            }
-        }
-    }
-
-
-class MedicineOrder(BaseModel):
-    id: int
-    medicine_name: str
-    quantity: PositiveInt
-    prescription: str | None = None
-    total_price: PositiveFloat
-    status: Order.OrderStatus | str
-    updated_at: datetime
+    patient_type: Treatment.PatientType
+    diagnosis: str
+    details: str
+    treatment_status: Treatment.TreatmentStatus
+    total_bill: float
     created_at: datetime
 
-    class Config:
-        json_schema_extra = {
-            "example": {
-                "id": 1,
-                "medicine_name": "Paracetamol",
-                "quantity": 2,
-                "prescription": "/media/prescriptions/prescription1.jpg",
-                "total_price": 19.99,
-                "status": "pending",
-                "updated_at": "2023-10-01T12:00:00",
-                "created_at": "2023-09-30T12:00:00",
-            }
-        }
-        from_attributes = True
+
+class PatientTreatment(ShallowPatientTreatment):
+    class TreatmentMedicine(BaseModel):
+        medicine_name: str
+        quantity: int
+        prescription: str
+        quantity: int
+        price_per_medicine: float
+        medicine_bill: float
+
+    class DoctorInvolved(BaseModel):
+        name: str
+        speciality: str
+        speciality_treatment_charges: float
+        speciality_department_name: str
+
+    doctors_involved: list[DoctorInvolved]
+    medicines_given: list[TreatmentMedicine]
+    total_medicine_bill: float
+    total_treatment_bill: float
+    updated_at: datetime
+
+
+class AvailableDoctor(BaseModel):
+    id: int
+    fullname: str
+    speciality: str
+    working_days: list[WorkingDay.DaysOfWeek]
+    department_name: str
+
+
+class DoctorDetails(BaseModel):
+    class Speciality(BaseModel):
+        name: str
+        appointment_charges: float
+        treatment_charges: float
+        department_name: str
+
+    id: int
+    first_name: Optional[str]
+    last_name: Optional[str]
+    email: Optional[str]
+    phone_number: Optional[str]
+    working_days: list[WorkingDay.DaysOfWeek]
+    shift: Doctor.WorkShift
+    speciality: Speciality
+
+
+class NewAppointmentWithDoctor(BaseModel):
+    doctor_id: int
+    appointment_datetime: FutureDatetime
+    reason: str
+
+
+class UpdateAppointmentWithDoctor(NewAppointmentWithDoctor):
+    status: Appointment.AppointmentStatus
+    appointment_datetime: datetime
+
+
+class AppointmentDetails(UpdateAppointmentWithDoctor):
+    appointment_charges: float
+    created_at: datetime
+    updated_at: datetime
+    appointment_datetime: datetime
+
+
+class AvailableAppointmentWithDoctor(AppointmentDetails):
+    id: int
+    appointment_datetime: datetime

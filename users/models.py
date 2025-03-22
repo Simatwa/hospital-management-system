@@ -5,6 +5,8 @@ from uuid import uuid4
 from os import path
 from django.core.validators import FileExtensionValidator
 from enum import Enum
+from datetime import datetime
+from django.core.validators import RegexValidator
 
 # Create your models here.
 
@@ -36,7 +38,7 @@ class Account(models.Model):
 class CustomUser(AbstractUser):
     """Both indiduals and organizations"""
 
-    class Role(Enum):
+    class UserRole(Enum):
         PATIENT = "Patient"
         DOCTOR = "Doctor"
         ADMIN = "Admin"
@@ -50,12 +52,30 @@ class CustomUser(AbstractUser):
         max_length=10,
         help_text=_("Select one"),
         choices=(
-            ["M", "Male"],
-            ["F", "Female"],
-            ["O", "Other"],
+            ["Male", "Male"],
+            ["Female", "Female"],
+            ["Other", "Other"],
         ),
         blank=True,
         default="O",
+    )
+    date_of_birth = models.DateField(
+        default=datetime(year=2000, month=1, day=1), help_text=_("Date of birth")
+    )
+
+    phone_number = models.CharField(
+        max_length=15,
+        validators=[
+            RegexValidator(
+                regex=r"^\+?1?\d{9,15}$",
+                message=_(
+                    "Phone number must be entered in the format: '+254...' or '07...'. Up to 15 digits allowed."
+                ),
+            )
+        ],
+        help_text=_("Contact phone number"),
+        blank=True,
+        null=True,
     )
 
     location = models.CharField(
@@ -73,8 +93,8 @@ class CustomUser(AbstractUser):
 
     role = models.CharField(
         max_length=10,
-        choices=Role.choices(),
-        default=Role.PATIENT.value,
+        choices=UserRole.choices(),
+        default=UserRole.PATIENT.value,
         help_text=_("Role of the user in the system"),
     )
 
@@ -105,6 +125,20 @@ class CustomUser(AbstractUser):
             new_account.save()
             self.account = new_account
         super().save(*args, **kwargs)
+
+    def age(self):
+        today = datetime.today().date()
+        return (
+            today.year
+            - self.date_of_birth.year
+            - (
+                (today.month, today.day)
+                < (self.date_of_birth.month, self.date_of_birth.day)
+            )
+        )
+
+    def __str__(self):
+        return self.username
 
 
 class Payment(models.Model):
