@@ -5,6 +5,8 @@ from enum import Enum
 from os import path
 from hospital.exceptions import InsufficientMedicineStockError
 from django.db.models import Sum
+from datetime import datetime
+from django.utils import timezone
 
 # Create your models here.
 
@@ -49,6 +51,9 @@ class Department(models.Model):
     lead = models.OneToOneField(
         CustomUser, on_delete=models.RESTRICT, help_text=_("Head of department")
     )
+    details = models.TextField(
+        null=True, blank=True, help_text=_("Information related to this department.")
+    )
     created_at = models.DateTimeField(
         auto_now_add=True,
         verbose_name=_("Created At"),
@@ -66,6 +71,9 @@ class Speciality(models.Model):
         on_delete=models.CASCADE,
         help_text=_("Department name"),
         related_name="specialities",
+    )
+    details = models.TextField(
+        null=True, blank=True, help_text=_("Information related to this speciality.")
     )
     appointment_charges = models.DecimalField(
         max_digits=8,
@@ -205,6 +213,43 @@ class Doctor(models.Model):
         auto_now_add=True,
         verbose_name=_("Created At"),
     )
+
+    def is_working_time(self, time: datetime) -> bool:
+        """Checks if doctor will be available at a given time
+
+        Args:
+            time (datetime): Time to check against
+
+        Raises:
+            ValueError: Inacse time is not an instance of `datetime`
+
+        Returns:
+            bool: Doctor's working status
+        """
+        if not isinstance(time, datetime):
+            raise ValueError(
+                f"Time needs to be an instance of " f"{datetime} not {type(time)}"
+            )
+        day_of_week: str = time.strftime("%A")
+        current_shift: str = (
+            self.WorkShift.DAY.value
+            if 6 <= time.hour < 18
+            else self.WorkShift.NIGHT.value
+        )
+        return (
+            self.working_days.filter(name=day_of_week).exists()
+            and self.shift == current_shift
+        )
+
+    @property
+    def is_working_now(self) -> bool:
+        return self.is_working_time(timezone.now())
+
+    def accepts_appointment_on(self, time: datetime) -> bool:
+        return (
+            self.appointments.filter(appointment_datetime__date=time.date()).count()
+            < self.speciality.appointments_limit
+        )
 
     def __str__(self):
         return str(self.user)
@@ -431,4 +476,4 @@ class Appointment(models.Model):
         super().save(*args, **kwargs)
 
     def __str__(self):
-        return f"{self.patient} with {self.doctor} on {self.appointment_datetime}"
+        return f"{self.patient} with {self.doctor} on {self.appointment_datetime.strftime("%d-%b-%Y %H:%M:%S")}"

@@ -2,6 +2,7 @@ from pydantic import BaseModel, Field, field_validator, FutureDatetime
 from typing import Optional, Any, Literal
 from datetime import datetime, date
 from hospital_ms.settings import MEDIA_URL
+from users.models import CustomUser
 from hospital.models import Treatment, WorkingDay, Doctor, Appointment
 from os import path
 
@@ -46,7 +47,7 @@ class EditablePersonalData(BaseModel):
 class Profile(EditablePersonalData):
     username: str
     date_of_birth: date
-    gender: Literal["Male", "Female", "Other"]
+    gender: CustomUser.UserGender
     account_balance: float
     profile: Optional[Any] = None
     is_staff: Optional[bool] = False
@@ -137,3 +138,15 @@ class AppointmentDetails(UpdateAppointmentWithDoctor):
 class AvailableAppointmentWithDoctor(AppointmentDetails):
     id: int
     appointment_datetime: datetime
+
+
+class SpecialityInfo(BaseModel):
+    name: str
+    details: Optional[str] = None
+    total_doctors: int
+
+
+class DepartmentInfo(BaseModel):
+    name: str
+    details: Optional[str] = None
+    specialities: list[SpecialityInfo]

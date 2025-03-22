@@ -2,7 +2,14 @@ from fastapi import APIRouter, status, HTTPException, Depends, Query, Path
 from fastapi.encoders import jsonable_encoder
 from fastapi.security.oauth2 import OAuth2PasswordBearer, OAuth2PasswordRequestForm
 from users.models import CustomUser
-from hospital.models import Patient, Treatment, Appointment, WorkingDay, Doctor
+from hospital.models import (
+    Patient,
+    Treatment,
+    Appointment,
+    Doctor,
+    Speciality,
+    Department,
+)
 
 # from django.contrib.auth.hashers import check_password
 from api.v1.utils import token_id, generate_token, get_day_and_shift
@@ -18,6 +25,8 @@ from api.v1.models import (
     NewAppointmentWithDoctor,
     UpdateAppointmentWithDoctor,
     AvailableAppointmentWithDoctor,
+    DepartmentInfo,
+    SpecialityInfo,
 )
 from pydantic import PositiveInt
 
@@ -139,11 +148,100 @@ def update_personal_info(
     )
 
 
-"""
-Treatments
-Appointments mgt
+@router.get("/specialities", name="Specialities available")
+def get_available_specialities() -> list[str]:
+    return [speciality.name for speciality in Speciality.objects.all()]
 
-"""
+
+@router.get("/departments", name="Departments available")
+def get_available_departments() -> list[DepartmentInfo]:
+    department_list = []
+    for department in Department.objects.all().order_by("-created_at"):
+        department_list.append(
+            DepartmentInfo(
+                name=department.name,
+                details=department.details,
+                specialities=[
+                    SpecialityInfo(
+                        name=speciality.name,
+                        details=speciality.details,
+                        total_doctors=speciality.doctors.count(),
+                    )
+                    for speciality in department.specialities.all()
+                ],
+            )
+        )
+    return department_list
+
+
+@router.get("/doctors", name="Doctors available")
+def get_doctors_available(
+    at: Annotated[datetime, Query(description="Particular time filter")] = None,
+    speciality_name: Annotated[str, Query(description="Doctor speciality name")] = None,
+    limit: Annotated[
+        PositiveInt, Query(description="Doctors amount not to exceed", gt=0, le=100)
+    ] = 100,
+    offset: Annotated[
+        int, Query(description="Return doctors whose IDs are greater than this")
+    ] = -1,
+) -> list[AvailableDoctor]:
+    if at:
+        day_of_week, work_shift = get_day_and_shift(at)
+        doctors = Doctor.objects.filter(
+            working_days__name=day_of_week, shift=work_shift, id__gt=offset
+        )
+    else:
+        doctors = Doctor.objects.filter(id__gt=offset)
+    if speciality_name:
+        doctors = doctors.filter(speciality__name=speciality_name)
+    available_doctors_list: list[AvailableDoctor] = []
+    for doctor in doctors[:limit]:
+        available_doctors_list.append(
+            AvailableDoctor(
+                id=doctor.id,
+                fullname=doctor.user.get_full_name(),
+                speciality=doctor.speciality.name,
+                working_days=[
+                    day.name
+                    for day in doctor.working_days.all().order_by("-created_at")
+                ],
+                department_name=doctor.speciality.department.name,
+            )
+        )
+    return available_doctors_list
+
+
+@router.get("/doctor{id}", name="Details of specific doctor")
+def get_specific_doctor_details(
+    id: Annotated[int, Path(description="Doctor ID")]
+) -> DoctorDetails:
+    try:
+        target_doctor = Doctor.objects.get(id=id)
+        user = target_doctor.user
+        speciality = target_doctor.speciality
+        return DoctorDetails(
+            id=target_doctor.id,
+            first_name=user.first_name,
+            last_name=user.last_name,
+            email=user.email,
+            phone_number=user.phone_number,
+            working_days=[
+                day.name
+                for day in target_doctor.working_days.all().order_by("-created_at")
+            ],
+            shift=target_doctor.shift,
+            speciality=DoctorDetails.Speciality(
+                name=speciality.name,
+                appointment_charges=speciality.appointment_charges,
+                treatment_charges=speciality.treatment_charges,
+                department_name=speciality.department.name,
+            ),
+        )
+    except Doctor.DoesNotExist:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            details=f"Doctor with id {id} does not exist.",
+        )
 
 
 @router.get("/treatments", name="Treatments ever administered")
@@ -229,76 +327,6 @@ def get_specific_treatment_details(
         )
 
 
-@router.get("/doctors", name="Doctors available")
-def get_doctors_available(
-    at: Annotated[datetime, Query(description="Particular time filter")] = None,
-    speciality_name: Annotated[str, Query(description="Doctor speciality name")] = None,
-    limit: Annotated[
-        PositiveInt, Query(description="Doctors amount not to exceed", gt=0, le=100)
-    ] = 100,
-    offset: Annotated[
-        int, Query(description="Return doctors whose IDs are greater than this")
-    ] = -1,
-) -> list[AvailableDoctor]:
-    if at:
-        day_of_week, work_shift = get_day_and_shift(at)
-        doctors = Doctor.objects.filter(
-            working_days__name=day_of_week, shift=work_shift, id__gt=offset
-        )
-    else:
-        doctors = Doctor.objects.filter(id__gt=offset)
-    if speciality_name:
-        doctors = doctors.filter(speciality__name=speciality_name)
-    available_doctors_list: list[AvailableDoctor] = []
-    for doctor in doctors[:limit]:
-        available_doctors_list.append(
-            AvailableDoctor(
-                id=doctor.id,
-                fullname=doctor.user.get_full_name(),
-                speciality=doctor.speciality.name,
-                working_days=[
-                    day.name
-                    for day in doctor.working_days.all().order_by("-created_at")
-                ],
-                department_name=doctor.speciality.department.name,
-            )
-        )
-    return available_doctors_list
-
-
-@router.get("/doctor{id}", name="Details of specific doctor")
-def get_specific_doctor_details(
-    id: Annotated[int, Path(description="Doctor ID")]
-) -> DoctorDetails:
-    try:
-        target_doctor = Doctor.objects.get(id=id)
-        user = target_doctor.user
-        speciality = target_doctor.speciality
-        return DoctorDetails(
-            id=target_doctor.id,
-            first_name=user.first_name,
-            last_name=user.last_name,
-            email=user.email,
-            phone_number=user.phone_number,
-            working_days=[
-                day.name
-                for day in target_doctor.working_days.all().order_by("-created_at")
-            ],
-            shift=target_doctor.shift,
-            speciality=DoctorDetails.Speciality(
-                name=speciality.name,
-                appointment_charges=speciality.appointment_charges,
-                treatment_charges=speciality.treatment_charges,
-                department_name=speciality.department.name,
-            ),
-        )
-    except Doctor.DoesNotExist:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            details=f"Doctor with id {id} does not exist.",
-        )
-
-
 @router.get("/appointments", name="Get appointments ever set")
 def get_appointments_ever_set(
     patient: Annotated[Patient, Depends(get_patient)],
@@ -343,40 +371,42 @@ def set_new_appointment(
 ) -> AvailableAppointmentWithDoctor:
     try:
         target_doctor = Doctor.objects.get(pk=new_appointment.doctor_id)
-        if (
-            target_doctor.appointments.count()
-            >= target_doctor.speciality.appointments_limit
-        ):
-            raise HTTPException(
-                status_code=status.HTTP_400_BAD_REQUEST,
-                detail="Doctor has reached the maximum number of appointments.",
-            )
-        day_of_week, shift = get_day_and_shift(new_appointment.appointment_datetime)
-        if (
-            target_doctor.working_days.filter(name=day_of_week).exists()
-            and target_doctor.shift == shift
-        ):
-            appointment = Appointment.objects.create(
-                patient=patient,
-                doctor=target_doctor,
-                appointment_datetime=new_appointment.appointment_datetime,
-                reason=new_appointment.reason,
-            )
-            appointment.save()
-            return AvailableAppointmentWithDoctor(
-                doctor_id=appointment.doctor.id,
-                appointment_datetime=appointment.appointment_datetime,
-                reason=appointment.reason,
-                id=appointment.id,
-                appointment_charges=appointment.doctor.speciality.appointment_charges,
-                status=appointment.status,
-                created_at=appointment.created_at,
-                updated_at=appointment.updated_at,
-            )
+        if target_doctor.is_working_time(new_appointment.appointment_datetime):
+            if target_doctor.accepts_appointment_on(
+                new_appointment.appointment_datetime
+            ):
+
+                appointment = Appointment.objects.create(
+                    patient=patient,
+                    doctor=target_doctor,
+                    appointment_datetime=new_appointment.appointment_datetime,
+                    reason=new_appointment.reason,
+                )
+                appointment.save()
+                return AvailableAppointmentWithDoctor(
+                    doctor_id=appointment.doctor.id,
+                    appointment_datetime=appointment.appointment_datetime,
+                    reason=appointment.reason,
+                    id=appointment.id,
+                    appointment_charges=appointment.doctor.speciality.appointment_charges,
+                    status=appointment.status,
+                    created_at=appointment.created_at,
+                    updated_at=appointment.updated_at,
+                )
+            else:
+                raise HTTPException(
+                    status_code=status.HTTP_400_BAD_REQUEST,
+                    detail=(
+                        "Doctor has reached the maximum number of appointments for the given date ."
+                        "Try other dates."
+                    ),
+                )
         else:
             raise HTTPException(
                 status_code=status.HTTP_400_BAD_REQUEST,
-                detail="Doctor is not available at the given time.",
+                detail=(
+                    "Doctor is not available at the given time. " "Try other times."
+                ),
             )
     except Doctor.DoesNotExist:
         raise HTTPException(
@@ -396,46 +426,47 @@ def update_existing_appointment(
         target_doctor = Doctor.objects.get(
             pk=(updated_appointment.doctor_id or appointment.doctor.id)
         )
-        if (
-            target_doctor.appointments.count()
-            >= target_doctor.speciality.appointments_limit
-        ):
-            raise HTTPException(
-                status_code=status.HTTP_400_BAD_REQUEST,
-                detail="Doctor has reached the maximum number of appointments.",
-            )
-        day_of_week, shift = get_day_and_shift(updated_appointment.appointment_datetime)
-        if (
-            target_doctor.working_days.filter(name=day_of_week).exists()
-            and target_doctor.shift == shift
-        ):
-            appointment.doctor = target_doctor
-            appointment.appointment_datetime = (
+        if updated_appointment.appointment_datetime:
+            if not target_doctor.is_working_time(
                 updated_appointment.appointment_datetime
-                or appointment.appointment_datetime
-            )
-            appointment.reason = updated_appointment.reason or appointment.reason
-            appointment.status = updated_appointment.status or appointment.status
-            appointment.save()
-            return AvailableAppointmentWithDoctor(
-                doctor_id=appointment.doctor.id,
-                appointment_datetime=appointment.appointment_datetime,
-                reason=appointment.reason,
-                id=appointment.id,
-                appointment_charges=(
-                    appointment.doctor.speciality.appointment_charges
-                    if appointment.status != appointment.AppointmentStatus.CANCELLED
-                    else 0
-                ),
-                status=appointment.status,
-                created_at=appointment.created_at,
-                updated_at=appointment.updated_at,
-            )
-        else:
-            raise HTTPException(
-                status_code=status.HTTP_400_BAD_REQUEST,
-                detail="Doctor is not available at the given time.",
-            )
+            ):
+                raise HTTPException(
+                    status_code=status.HTTP_400_BAD_REQUEST,
+                    detail=(
+                        "Doctor is not available at the given time. " "Try other times."
+                    ),
+                )
+            if not target_doctor.accepts_appointment_on(
+                updated_appointment.appointment_datetime
+            ):
+                raise HTTPException(
+                    status_code=status.HTTP_400_BAD_REQUEST,
+                    detail=(
+                        "Doctor has reached the maximum number of appointments for the given date. "
+                        "Try other dates."
+                    ),
+                )
+        appointment.doctor = target_doctor
+        appointment.appointment_datetime = (
+            updated_appointment.appointment_datetime or appointment.appointment_datetime
+        )
+        appointment.reason = updated_appointment.reason or appointment.reason
+        appointment.status = updated_appointment.status or appointment.status
+        appointment.save()
+        return AvailableAppointmentWithDoctor(
+            doctor_id=appointment.doctor.id,
+            appointment_datetime=appointment.appointment_datetime,
+            reason=appointment.reason,
+            id=appointment.id,
+            appointment_charges=(
+                appointment.doctor.speciality.appointment_charges
+                if appointment.status != appointment.AppointmentStatus.CANCELLED
+                else 0
+            ),
+            status=appointment.status,
+            created_at=appointment.created_at,
+            updated_at=appointment.updated_at,
+        )
     except Appointment.DoesNotExist:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
@@ -452,7 +483,7 @@ def update_existing_appointment(
 def delete_appointment(
     patient: Annotated[Patient, Depends(get_patient)],
     id: Annotated[int, Path(description="Appointment ID")],
-) -> dict:
+) -> Feedback:
     try:
         appointment = Appointment.objects.get(pk=id, patient=patient)
         appointment.delete()

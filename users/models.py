@@ -45,19 +45,23 @@ class CustomUser(AbstractUser):
 
         @classmethod
         def choices(cls):
-            return [(key.name, key.value) for key in cls]
+            return [(key.value, key.name) for key in cls]
+
+    class UserGender(Enum):
+        MALE = "M"
+        FEMALE = "F"
+        OTHER = "O"
+
+        @classmethod
+        def choices(cls) -> list[tuple]:
+            return [(key.value, key.name) for key in cls]
 
     gender = models.CharField(
         verbose_name=_("gender"),
         max_length=10,
         help_text=_("Select one"),
-        choices=(
-            ["Male", "Male"],
-            ["Female", "Female"],
-            ["Other", "Other"],
-        ),
-        blank=True,
-        default="O",
+        choices=UserGender.choices(),
+        default=UserGender.OTHER.value,
     )
     date_of_birth = models.DateField(
         default=datetime(year=2000, month=1, day=1), help_text=_("Date of birth")
