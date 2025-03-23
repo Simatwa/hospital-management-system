@@ -423,3 +423,78 @@ class SendMPESAPopupTo(BaseModel):
         json_schema_extra = {
             "example": {"phone_number": "+1234567890", "amount": 100.0}
         }
+
+
+class ServiceFeedbackInfo(BaseModel):
+    # message
+    pass
+
+
+class HospitalGallery(BaseModel):
+    title: str
+    details: str
+    location_name: str
+    video_link: Optional[str] = None
+    picture: Optional[str] = None
+    date: date
+
+    @field_validator("picture")
+    def validate_file(value):
+        if value and not value.startswith("/"):
+            return path.join(MEDIA_URL, value)
+        return value
+
+
+class HospitalInfo(BaseModel):
+    name: str
+    short_name: str
+    details: str
+    slogan: str
+    location_name: str
+    latitude: float
+    longitude: float
+    founded_in: date
+    founder_name: str
+    mission: str
+    vision: str
+    email: Optional[str] = None
+    facebook: Optional[str] = None
+    twitter: Optional[str] = None
+    linkedin: Optional[str] = None
+    instagram: Optional[str] = None
+    tiktok: Optional[str] = None
+    youtube: Optional[str] = None
+    logo: Optional[str] = None
+    wallpaper: Optional[str] = None
+
+    @field_validator("logo", "wallpaper")
+    def validate_file(value):
+        if value and not value.startswith("/"):
+            return path.join(MEDIA_URL, value)
+        return value
+
+    class Config:
+        json_schema_extra = {
+            "example": {
+                "name": "Smart Hospital",
+                "short_name": "SH",
+                "details": "Welcome to our hospital. We are committed to providing the best healthcare services.",
+                "slogan": "We treat but God heals.",
+                "location_name": "Meru - Kenya",
+                "latitude": 0.000000,
+                "longitude": 0.000000,
+                "founded_in": "2023-01-01",
+                "founder_name": "GoK",
+                "mission": "To provide quality healthcare services to all.",
+                "vision": "To be the leading healthcare provider in the region.",
+                "email": "admin@hospital.com",
+                "facebook": "https://www.facebook.com/",
+                "twitter": "https://www.x.com/",
+                "linkedin": "https://www.linkedin.com/",
+                "instagram": "https://www.instagram.com/",
+                "tiktok": "https://www.tiktok.com/",
+                "youtube": "https://www.youtube.com/",
+                "logo": "/media/hospital/logo.png",
+                "wallpaper": "/media/hospital/wallpaper.jpg",
+            }
+        }

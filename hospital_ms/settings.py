@@ -183,6 +183,7 @@ JAZZMIN_SETTINGS = {
         "hospital.AccountDetails": "fas fa-file-invoice-dollar",
         "hospital.ServiceFeedback": "fas fa-comments",
         "hospital.Gallery": "fas fa-images",
+        "hospital.About": "fas fa-info-circle",
     },
 }
 

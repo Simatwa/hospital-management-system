@@ -13,12 +13,54 @@ from hospital.models import (
     AccountDetails,
     ServiceFeedback,
     Gallery,
+    About,
 )
 
 from django.utils.translation import gettext_lazy as _
 from django.utils import timezone
 
 # Register your models here.
+
+
+@admin.register(About)
+class AboutAdmin(admin.ModelAdmin):
+    list_display = ("name", "short_name", "founded_in", "founder_name", "updated_at")
+    fieldsets = (
+        (None, {"fields": ("name", "short_name", "slogan", "details")}),
+        (
+            _("Location"),
+            {"fields": ("location_name", "latitude", "longitude")},
+        ),
+        (
+            _("History"),
+            {"fields": ("founded_in", "founder_name")},
+        ),
+        (
+            _("Statements"),
+            {"fields": ("mission", "vision")},
+        ),
+        (
+            _("Contact"),
+            {"fields": ("email",)},
+        ),
+        (
+            _("Social Media"),
+            {
+                "fields": (
+                    "facebook",
+                    "twitter",
+                    "linkedin",
+                    "instagram",
+                    "tiktok",
+                    "youtube",
+                )
+            },
+        ),
+        (
+            _("Media"),
+            {"fields": ("logo", "wallpaper")},
+        ),
+    )
 
 
 @admin.register(WorkingDay)
@@ -228,3 +270,8 @@ class GalleryAdmin(admin.ModelAdmin):
     search_fields = ("title",)
     list_filter = ("date", "created_at")
     list_editable = ("show_in_index",)
+
+    fieldsets = (
+        (None, {"fields": ("title", "details", "location_name", "date")}),
+        (_("Media & Display"), {"fields": ("picture", "video_link", "show_in_index")}),
+    )

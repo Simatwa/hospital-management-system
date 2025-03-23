@@ -10,6 +10,8 @@ from hospital.models import (
     Speciality,
     Department,
     AccountDetails,
+    Gallery,
+    About,
 )
 
 # from django.contrib.auth.hashers import check_password
@@ -30,6 +32,8 @@ from api.v1.models import (
     SpecialityInfo,
     PaymentAccountDetails,
     SendMPESAPopupTo,
+    HospitalGallery,
+    HospitalInfo,
 )
 from pydantic import PositiveInt
 
@@ -151,6 +155,21 @@ def update_personal_info(
         email=user.email,
         location=user.location,
     )
+
+
+@router.get("/abouts", name="Details about hospital")
+def get_hospital_details() -> HospitalInfo:
+    return HospitalInfo(**jsonable_encoder(About.objects.all().first()))
+
+
+@router.get("/galleries", name="Hospital galleries")
+def get_hospital_galleries() -> list[HospitalGallery]:
+    return [
+        HospitalGallery(**jsonable_encoder(gallery))
+        for gallery in Gallery.objects.filter(show_in_index=True)
+        .all()
+        .order_by("-created_at")[:30]
+    ]
 
 
 @router.get("/specialities", name="Specialities available")

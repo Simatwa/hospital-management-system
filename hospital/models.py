@@ -16,6 +16,124 @@ def generate_document_filepath(instance: "Medicine", filename: str) -> str:
     return f"{instance.__class__.__name__.lower()}/{filename}_{instance.id}{extension}"
 
 
+class About(models.Model):
+    name = models.CharField(
+        max_length=40, help_text="The hospital name", default="Smart Hospital"
+    )
+    short_name = models.CharField(
+        max_length=30, help_text="Hospital abbreviated name", default="SH"
+    )
+    slogan = models.TextField(
+        help_text=_("Hospital's slogan"), default="We treat but God heals."
+    )
+    details = models.TextField(
+        help_text=_("Hospital details"),
+        default="Welcome to our hospital. We are committed to providing the best healthcare services.",
+        null=False,
+        blank=False,
+    )
+    location_name = models.CharField(
+        max_length=200, help_text=_("Hospital location name(s)"), default="Meru - Kenya"
+    )
+    latitude = models.DecimalField(
+        max_digits=9,
+        decimal_places=6,
+        default=0.000000,
+        help_text=_("Latitude of the hospital location"),
+    )
+    longitude = models.DecimalField(
+        max_digits=9,
+        decimal_places=6,
+        default=0.000000,
+        help_text=_("Longitude of the hospital location"),
+    )
+    founded_in = models.DateField(
+        help_text=_("Date when the hospital was founded"), default=timezone.now
+    )
+    founder_name = models.CharField(
+        max_length=50, help_text=_("Name of the hospital founder"), default="GoK"
+    )
+    mission = models.TextField(
+        help_text=_("Hospital's mission statement"),
+        default="To provide quality healthcare services to all.",
+    )
+    vision = models.TextField(
+        help_text=_("Hospital's vision statement"),
+        default="To be the leading healthcare provider in the region.",
+    )
+    email = models.EmailField(
+        max_length=50,
+        help_text="Website's admin email",
+        null=True,
+        blank=True,
+        default="admin@hospital.com",
+    )
+    facebook = models.URLField(
+        max_length=100,
+        help_text=_("Hospital's Facebook profile link"),
+        null=True,
+        blank=True,
+        default="https://www.facebook.com/",
+    )
+    twitter = models.URLField(
+        max_length=100,
+        help_text=_("Hospital's X (formerly Twitter) profile link"),
+        null=True,
+        blank=True,
+        default="https://www.x.com/",
+    )
+    linkedin = models.URLField(
+        max_length=100,
+        help_text=_("Hospital's Facebook profile link"),
+        null=True,
+        blank=True,
+        default="https://www.linkedin.com/",
+    )
+    instagram = models.URLField(
+        max_length=100,
+        help_text=_("Hospital's Instagram profile link"),
+        null=True,
+        blank=True,
+        default="https://www.instagram.com/",
+    )
+    tiktok = models.URLField(
+        max_length=100,
+        help_text=_("Hospital's Tiktok profile link"),
+        null=True,
+        blank=True,
+        default="https://www.tiktok.com/",
+    )
+    youtube = models.URLField(
+        max_length=100,
+        help_text=_("Hospital's Youtube profile link"),
+        null=True,
+        blank=True,
+        default="https://www.youtube.com/",
+    )
+    logo = models.ImageField(
+        help_text=_("Hospital logo  (preferrably 64*64px png)"),
+        upload_to=generate_document_filepath,
+        default="/static/hospital/img/logo.png",
+    )
+    wallpaper = models.ImageField(
+        help_text=_("Hospital wallpaper image"),
+        upload_to=generate_document_filepath,
+        default="default/surgery-1822458_1920.jpg",
+    )
+    updated_at = models.DateTimeField(
+        auto_now=True,
+        verbose_name=_("Updated At"),
+    )
+    created_at = models.DateTimeField(
+        auto_now_add=True,
+        verbose_name=_("Created At"),
+        help_text=_("The date and time when the treatment was created"),
+    )
+
+    def __str__(self):
+        return self.name
+
+
 class AccountDetails(models.Model):
     name = models.CharField(max_length=50, help_text=_("Account name e.g M-PESA"))
     paybill_number = models.CharField(
@@ -39,7 +157,7 @@ class AccountDetails(models.Model):
     created_at = models.DateTimeField(
         auto_now_add=True,
         verbose_name=_("Created At"),
-        help_text=_("The date and time when the treatment was created"),
+        help_text=_("The date and time when the account was created"),
     )
 
     class Meta:
@@ -596,10 +714,16 @@ class Appointment(models.Model):
 class Gallery(models.Model):
     title = models.CharField(max_length=50, help_text=_("Gallery title"))
     details = models.TextField(help_text=_("What about this gallery?"))
+    location_name = models.CharField(
+        max_length=100, help_text=_("Event location name"), default="Hospital"
+    )
     picture = models.ImageField(
         help_text=_("Gallery photograph"),
         upload_to=generate_document_filepath,
         default="default/surgery-1822458_1920.jpg",
+    )
+    video_link = models.URLField(
+        max_length=100, help_text=_("YouTube video link"), null=True, blank=True
     )
     date = models.DateField(help_text="Gallery date", default=timezone.now)
     show_in_index = models.BooleanField(
@@ -615,6 +739,9 @@ class Gallery(models.Model):
         verbose_name=_("Created At"),
         help_text=_("The date and time when the gallery was created"),
     )
+
+    def __str__(self):
+        return f"{self.title} in {self.location_name} on {self.date}"
 
     class Meta:
         verbose_name_plural = _("Galleries")
