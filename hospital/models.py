@@ -84,6 +84,13 @@ class Department(models.Model):
     details = models.TextField(
         null=True, blank=True, help_text=_("Information related to this department.")
     )
+    profile = models.ImageField(
+        upload_to=generate_document_filepath,
+        default="default/medical-equipment-4099429_1920.jpg",
+        verbose_name=_("Profile"),
+        help_text=_("Department's profile picture"),
+        blank=True,
+    )
     created_at = models.DateTimeField(
         auto_now_add=True,
         verbose_name=_("Created At"),
@@ -191,7 +198,7 @@ class Medicine(models.Model):
         upload_to=generate_document_filepath,
         default="default/ai-generated-medicine.jpg",
         verbose_name=_("Photo of the medicine"),
-        help_text=_("Upload a photo of the medicine"),
+        help_text=_("Photo of the medicine"),
         blank=True,
     )
     created_at = models.DateTimeField(
@@ -358,6 +365,39 @@ class ExtraFee(models.Model):
         return f"{self.name} (Ksh.{self.amount})"
 
 
+class ServiceFeedback(models.Model):
+    class FeedbackRate(Enum):
+        EXCELLENT = "Excellent"
+        GOOD = "Good"
+        AVERAGE = "Average"
+        POOR = "Poor"
+        TERRIBLE = "Terrible"
+
+        @classmethod
+        def choices(cls):
+            return [(key.value, key.name) for key in cls]
+
+    sender = models.ForeignKey(
+        CustomUser, on_delete=models.CASCADE, help_text=_("Feedback sender")
+    )
+    message = models.TextField(help_text=_("Response body"))
+    rate = models.CharField(
+        max_length=15, choices=FeedbackRate.choices(), help_text=_("Feedback rating")
+    )
+    show_in_index = models.BooleanField(
+        default=False,
+        help_text=_("Display this feedback in website's feedback sections."),
+    )
+    updated_at = models.DateTimeField(
+        auto_now=True,
+        verbose_name=_("Updated At"),
+    )
+    created_at = models.DateTimeField(
+        auto_now_add=True,
+        verbose_name=_("Created At"),
+    )
+
+
 class Treatment(models.Model):
     class PatientType(Enum):
         OUTPATIENT = "Outpatient"
@@ -412,6 +452,11 @@ class Treatment(models.Model):
         choices=TreatmentStatus.choices(),
         default=TreatmentStatus.INPROGRESS.value,
         help_text=_("Treatment status"),
+    )
+    feedbacks = models.ManyToManyField(
+        ServiceFeedback,
+        help_text=_("Treatment service feedback"),
+        related_name="treatments",
     )
     bill_settled = models.DecimalField(
         max_digits=8,
@@ -511,6 +556,11 @@ class Appointment(models.Model):
         default=AppointmentStatus.SCHEDULED.value,
         help_text=_("Select appointment status"),
     )
+    feedbacks = models.ManyToManyField(
+        ServiceFeedback,
+        help_text=_("Appointment service feedback"),
+        related_name="appointments",
+    )
     updated_at = models.DateTimeField(
         auto_now=True,
         verbose_name=_("Updated At"),
@@ -541,3 +591,30 @@ class Appointment(models.Model):
 
     def __str__(self):
         return f"{self.patient} with {self.doctor} on {self.appointment_datetime.strftime("%d-%b-%Y %H:%M:%S")}"
+
+
+class Gallery(models.Model):
+    title = models.CharField(max_length=50, help_text=_("Gallery title"))
+    details = models.TextField(help_text=_("What about this gallery?"))
+    picture = models.ImageField(
+        help_text=_("Gallery photograph"),
+        upload_to=generate_document_filepath,
+        default="default/surgery-1822458_1920.jpg",
+    )
+    date = models.DateField(help_text="Gallery date", default=timezone.now)
+    show_in_index = models.BooleanField(
+        default=True, help_text=_("Display this gallery in website's gallery section.")
+    )
+    updated_at = models.DateTimeField(
+        auto_now=True,
+        verbose_name=_("Updated At"),
+        help_text=_("The date and time when the gallery was last updated"),
+    )
+    created_at = models.DateTimeField(
+        auto_now_add=True,
+        verbose_name=_("Created At"),
+        help_text=_("The date and time when the gallery was created"),
+    )
+
+    class Meta:
+        verbose_name_plural = _("Galleries")

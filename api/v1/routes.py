@@ -174,6 +174,8 @@ def get_available_departments() -> list[DepartmentInfo]:
                     )
                     for speciality in department.specialities.all()
                 ],
+                profile=department.profile.name,
+                created_at=department.created_at,
             )
         )
     return department_list
@@ -206,6 +208,7 @@ def get_doctors_available(
                 id=doctor.id,
                 fullname=doctor.user.get_full_name(),
                 speciality=doctor.speciality.name,
+                profile=doctor.user.profile.name,
                 working_days=[
                     day.name
                     for day in doctor.working_days.all().order_by("-created_at")
@@ -314,6 +317,7 @@ def get_specific_treatment_details(
                 PatientTreatment.DoctorInvolved(
                     name=doctor.user.get_full_name(),
                     speciality=doctor.speciality.name,
+                    profile=doctor.user.profile.name,
                     speciality_treatment_charges=doctor.speciality.treatment_charges,
                     speciality_department_name=doctor.speciality.department.name,
                 )

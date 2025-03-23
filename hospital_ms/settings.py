@@ -181,6 +181,8 @@ JAZZMIN_SETTINGS = {
         "hospital.TreatmentMedicine": "fas fa-capsules",
         "hospital.ExtraFee": "fas fa-dollar-sign",
         "hospital.AccountDetails": "fas fa-file-invoice-dollar",
+        "hospital.ServiceFeedback": "fas fa-comments",
+        "hospital.Gallery": "fas fa-images",
     },
 }
 

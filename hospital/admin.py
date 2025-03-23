@@ -11,6 +11,8 @@ from hospital.models import (
     Appointment,
     ExtraFee,
     AccountDetails,
+    ServiceFeedback,
+    Gallery,
 )
 
 from django.utils.translation import gettext_lazy as _
@@ -210,3 +212,19 @@ class AccountDetailsAdmin(admin.ModelAdmin):
     )
     search_fields = ("name", "paybill_number")
     list_filter = ("is_active", "created_at", "updated_at")
+
+
+@admin.register(ServiceFeedback)
+class ServiceFeedbackAdmin(admin.ModelAdmin):
+    list_display = ("sender", "rate", "show_in_index", "updated_at", "created_at")
+    search_fields = ("sender__username", "message")
+    list_filter = ("rate", "show_in_index", "updated_at", "created_at")
+    list_editable = ("show_in_index",)
+
+
+@admin.register(Gallery)
+class GalleryAdmin(admin.ModelAdmin):
+    list_display = ("title", "picture", "show_in_index", "date", "updated_at")
+    search_fields = ("title",)
+    list_filter = ("date", "created_at")
+    list_editable = ("show_in_index",)

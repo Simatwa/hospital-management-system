@@ -60,7 +60,7 @@ class Profile(EditablePersonalData):
     date_of_birth: date
     gender: CustomUser.UserGender
     account_balance: float
-    profile: Optional[Any] = None
+    profile: Optional[str] = None
     is_staff: Optional[bool] = False
     date_joined: datetime
 
@@ -135,14 +135,22 @@ class PatientTreatment(ShallowPatientTreatment):
     class DoctorInvolved(BaseModel):
         name: str
         speciality: str
+        profile: Optional[str] = None
         speciality_treatment_charges: float
         speciality_department_name: str
+
+        @field_validator("profile")
+        def validate_file(value):
+            if value:
+                return path.join(MEDIA_URL, value)
+            return value
 
         class Config:
             json_schema_extra = {
                 "example": {
                     "name": "Dr. Smith",
                     "speciality": "Cardiology",
+                    "profile": "/media/custom_user/dr-smith-001.jpg",
                     "speciality_treatment_charges": 150.0,
                     "speciality_department_name": "Cardiology",
                 }
@@ -206,8 +214,15 @@ class AvailableDoctor(BaseModel):
     id: int
     fullname: str
     speciality: str
+    profile: Optional[str] = None
     working_days: list[WorkingDay.DaysOfWeek]
     department_name: str
+
+    @field_validator("profile")
+    def validate_file(value):
+        if value:
+            return path.join(MEDIA_URL, value)
+        return value
 
     class Config:
         json_schema_extra = {
@@ -215,6 +230,7 @@ class AvailableDoctor(BaseModel):
                 "id": 1,
                 "fullname": "Dr. John Doe",
                 "speciality": "Cardiology",
+                "profile": "/media/custom_user/dr-john-doe.jpg",
                 "working_days": ["Monday", "Wednesday", "Friday"],
                 "department_name": "Cardiology",
             }
@@ -355,6 +371,14 @@ class DepartmentInfo(BaseModel):
     name: str
     details: Optional[str] = None
     specialities: list[SpecialityInfo]
+    profile: Optional[str] = None
+    created_at: datetime
+
+    @field_validator("profile")
+    def validate_file(value):
+        if value:
+            return path.join(MEDIA_URL, value)
+        return value
 
     class Config:
         json_schema_extra = {
@@ -368,6 +392,8 @@ class DepartmentInfo(BaseModel):
                         "total_doctors": 10,
                     }
                 ],
+                "profile": "/media/department/cardiology-profile.jpg",
+                "created_at": "2023-01-01T00:00:00",
             }
         }
 
