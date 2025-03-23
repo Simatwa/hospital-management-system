@@ -14,6 +14,8 @@ from hospital.models import (
     ServiceFeedback,
     Gallery,
     About,
+    News,
+    Subscriber,
 )
 
 from django.utils.translation import gettext_lazy as _
@@ -275,3 +277,39 @@ class GalleryAdmin(admin.ModelAdmin):
         (None, {"fields": ("title", "details", "location_name", "date")}),
         (_("Media & Display"), {"fields": ("picture", "video_link", "show_in_index")}),
     )
+
+
+@admin.register(News)
+class NewsAdmin(admin.ModelAdmin):
+    list_display = ("title", "category", "is_published", "views", "created_at")
+    list_filter = ("category", "created_at", "updated_at", "views")
+    search_fields = ("title", "summary")
+    fieldsets = (
+        (
+            None,
+            (
+                {
+                    "fields": (
+                        "title",
+                        "category",
+                        "content",
+                        "summary",
+                    )
+                }
+            ),
+        ),
+        (_("Media"), ({"fields": ("cover_photo", "document", "video_link")})),
+    )
+    list_editable = ("is_published",)
+
+
+@admin.register(Subscriber)
+class SubscriberAdmin(admin.ModelAdmin):
+    list_display = (
+        "email",
+        "is_verified",
+        "updated_at",
+        "created_at",
+    )
+    list_filter = ("is_verified", "updated_at", "created_at")
+    search_fields = ("email",)

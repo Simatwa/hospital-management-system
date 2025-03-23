@@ -503,7 +503,7 @@ class ServiceFeedback(models.Model):
         max_length=15, choices=FeedbackRate.choices(), help_text=_("Feedback rating")
     )
     show_in_index = models.BooleanField(
-        default=False,
+        default=True,
         help_text=_("Display this feedback in website's feedback sections."),
     )
     updated_at = models.DateTimeField(
@@ -745,3 +745,88 @@ class Gallery(models.Model):
 
     class Meta:
         verbose_name_plural = _("Galleries")
+
+
+class News(models.Model):
+    class NewsCategory(Enum):
+        GENERAL = "General"
+        HEALTH = "Health"
+        EVENTS = "Events"
+        ANNOUNCEMENTS = "Announcements"
+
+        @classmethod
+        def choices(cls):
+            return [(key.value, key.name) for key in cls]
+
+    title = models.CharField(max_length=40, help_text=_("News title"))
+    category = models.CharField(
+        max_length=20,
+        choices=NewsCategory.choices(),
+        default=NewsCategory.GENERAL.value,
+        help_text=_("Select the category of the news"),
+    )
+    content = models.TextField(help_text=_("News in detail"))
+    summary = models.TextField(help_text=_("News in brief"))
+    cover_photo = models.ImageField(
+        help_text=_("News cover photo"),
+        upload_to=generate_document_filepath,
+        default="default/news-3584901_66059.jpg",
+    )
+    document = models.FileField(
+        help_text=_("Any relevant file attached to the news"),
+        upload_to=generate_document_filepath,
+        null=True,
+        blank=True,
+    )
+    video_link = models.URLField(
+        max_length=100,
+        help_text=_("Youtube video link relatint to the news"),
+        null=True,
+        blank=True,
+    )
+    is_published = models.BooleanField(default=True, help_text=_("Publish this news."))
+    views = models.IntegerField(
+        default=0, help_text=_("Number of times the news has been requested.")
+    )
+    updated_at = models.DateTimeField(
+        auto_now=True,
+        verbose_name=_("Updated At"),
+        help_text=_("The date and time when the news was last updated"),
+    )
+    created_at = models.DateTimeField(
+        auto_now_add=True,
+        verbose_name=_("Created At"),
+        help_text=_("The date and time when the news was created"),
+    )
+
+    class Meta:
+        verbose_name_plural = _("News")
+
+    def __str__(self):
+        return f"'{self.title}' on {self.created_at.strftime('%d-%b-%Y %H:%M:%S')}"
+
+    def save(self, *args, **kwargs):
+        if not self.id:  # new entry
+            # Consider mailing subscribers
+            pass
+        super().save(*args, **kwargs)
+
+
+class Subscriber(models.Model):
+    email = models.EmailField(help_text=_("Email address"), unique=True)
+    token = models.UUIDField(help_text="Subscription confirmation token", unique=True)
+    is_verified = models.BooleanField(default=False, help_text=_("Verification status"))
+
+    updated_at = models.DateTimeField(
+        auto_now=True,
+        verbose_name=_("Updated At"),
+        help_text=_("The date and time when the gallery was last updated"),
+    )
+    created_at = models.DateTimeField(
+        auto_now_add=True,
+        verbose_name=_("Created At"),
+        help_text=_("The date and time when the gallery was created"),
+    )
+
+    def __str__(self):
+        return self.email

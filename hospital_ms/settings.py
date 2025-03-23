@@ -184,6 +184,8 @@ JAZZMIN_SETTINGS = {
         "hospital.ServiceFeedback": "fas fa-comments",
         "hospital.Gallery": "fas fa-images",
         "hospital.About": "fas fa-info-circle",
+        "hospital.News": "fas fa-newspaper",
+        "hospital.Subscriber": "fas fa-user-plus",
     },
 }
 

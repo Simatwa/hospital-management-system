@@ -1,4 +1,4 @@
-from fastapi import APIRouter, status, HTTPException, Depends, Query, Path
+from fastapi import APIRouter, status, HTTPException, Depends, Query, Path, Form
 from fastapi.encoders import jsonable_encoder
 from fastapi.security.oauth2 import OAuth2PasswordBearer, OAuth2PasswordRequestForm
 from users.models import CustomUser
@@ -12,9 +12,13 @@ from hospital.models import (
     AccountDetails,
     Gallery,
     About,
+    News,
+    Subscriber,
+    ServiceFeedback,
 )
 
 # from django.contrib.auth.hashers import check_password
+from django.db import IntegrityError
 from api.v1.utils import token_id, generate_token, get_day_and_shift
 from api.v1.models import (
     TokenAuth,
@@ -33,9 +37,16 @@ from api.v1.models import (
     PaymentAccountDetails,
     SendMPESAPopupTo,
     HospitalGallery,
-    HospitalInfo,
+    HospitalAbout,
+    ShallowHospitalNews,
+    HospitalNews,
+    UserFeedback,
+    NewFeedbackInfo,
+    UpdateFeedbackInfo,
+    CompleteFeedbackInfo,
 )
-from pydantic import PositiveInt
+from pydantic import PositiveInt, EmailStr
+from uuid import uuid4
 
 import asyncio
 from typing import Annotated
@@ -157,9 +168,9 @@ def update_personal_info(
     )
 
 
-@router.get("/abouts", name="Details about hospital")
-def get_hospital_details() -> HospitalInfo:
-    return HospitalInfo(**jsonable_encoder(About.objects.all().first()))
+@router.get("/about", name="Details about hospital")
+def get_hospital_details() -> HospitalAbout:
+    return HospitalAbout(**jsonable_encoder(About.objects.all().first()))
 
 
 @router.get("/galleries", name="Hospital galleries")
@@ -170,6 +181,61 @@ def get_hospital_galleries() -> list[HospitalGallery]:
         .all()
         .order_by("-created_at")[:30]
     ]
+
+
+@router.get("/news", name="News published")
+def get_published_news() -> list[ShallowHospitalNews]:
+    return [
+        HospitalNews(**jsonable_encoder(news))
+        for news in News.objects.filter(is_published=True).order_by("-created_at")
+    ]
+
+
+@router.get("/news/{id}", name="News in detail")
+def get_published_news_details(
+    id: Annotated[int, Path(description="News ID")]
+) -> HospitalNews:
+    try:
+        target_news = News.objects.get(pk=id, is_published=True)
+        target_news_dict = jsonable_encoder(target_news)
+        target_news.views += 1
+        target_news_dict["views"] += 1
+        target_news.save()
+        return HospitalNews(**target_news_dict)
+    except News.DoesNotExist:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=f"News with id {id} does not exist.",
+        )
+
+
+@router.post("/subscribe", name="Add subscription")
+def add_subscription(
+    email: Annotated[EmailStr, Form(description="Email address")]
+) -> Feedback:
+    try:
+        new_subscriber = Subscriber.objects.create(
+            email=email,
+            token=uuid4(),
+        )
+        new_subscriber.save()
+        # TODO: Send confirmation link to email
+        return Feedback(detail="Check your email inbox to confirm subscription.")
+    except IntegrityError:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="A subscription with this email already exists.",
+        )
+
+
+@router.get("/feedbacks", name="Get user's feedbacks")
+def get_users_feedbacks() -> list[UserFeedback]:
+    feedback_list = []
+    for feedback in ServiceFeedback.objects.filter(show_in_index=True).all():
+        user_feedback = jsonable_encoder(feedback)
+        user_feedback["user"] = jsonable_encoder(feedback.sender)
+        feedback_list.append(user_feedback)
+    return feedback_list
 
 
 @router.get("/specialities", name="Specialities available")
@@ -348,6 +414,10 @@ def get_specific_treatment_details(
                 )
                 for fee in treatment.extra_fees.all()
             ]
+            treatment_dict["feedbacks"] = [
+                CompleteFeedbackInfo(**jsonable_encoder(feedback))
+                for feedback in treatment.feedbacks.all().order_by("-created_at")
+            ]
             return PatientTreatment(**treatment_dict)
         else:
             raise HTTPException(
@@ -358,6 +428,65 @@ def get_specific_treatment_details(
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
             detail=f"Treatment with id {id} does not exist.",
+        )
+
+
+@router.post("/treatment/{id}/feedback", name="Add treatment feedback")
+def add_treatment_feedback(
+    patient: Annotated[Patient, Depends(get_patient)],
+    id: Annotated[int, Path(description="Treatment ID")],
+    new_feedback: NewFeedbackInfo,
+) -> CompleteFeedbackInfo:
+    try:
+        target_treatment = Treatment.objects.get(pk=id, patient=patient)
+        new_feedback = ServiceFeedback(
+            sender=patient.user,
+            message=new_feedback.message,
+            rate=new_feedback.rate.value,
+        )
+        new_feedback.save()
+        target_treatment.feedbacks.add(new_feedback)
+        target_treatment.save()
+        return CompleteFeedbackInfo.from_model(new_feedback)
+    except Treatment.DoesNotExist:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=f"Treatment with id {id} does not exist.",
+        )
+
+
+@router.patch("/feedback/{id}", name="Update service feedback")
+def update_service_feedback(
+    patient: Annotated[Patient, Depends(get_patient)],
+    id: Annotated[int, Path(description="Feedback ID")],
+    updated_feedback: UpdateFeedbackInfo,
+) -> CompleteFeedbackInfo:
+    try:
+        target_feedback = ServiceFeedback.objects.get(pk=id, sender=patient.user)
+        target_feedback.message = updated_feedback.message or target_feedback.message
+        target_feedback.rate = updated_feedback.rate.value or target_feedback.rate
+        target_feedback.save()
+        return CompleteFeedbackInfo.from_model(target_feedback)
+    except ServiceFeedback.DoesNotExist:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=f"Service feedback with id {id} does not exist.",
+        )
+
+
+@router.delete("/feedback/{id}", name="Delete service feedback")
+def delete_service_feedbak(
+    patient: Annotated[Patient, Depends(get_patient)],
+    id: Annotated[int, Path(description="Feedback ID")],
+) -> Feedback:
+    try:
+        target_feedback = ServiceFeedback.objects.get(pk=id, sender=patient.user)
+        target_feedback.delete(keep_parents=True)
+        return Feedback(detail="Feedback deleted successfully")
+    except ServiceFeedback.DoesNotExist:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=f"Service feedback with id {id} does not exist.",
         )
 
 
@@ -393,6 +522,10 @@ def get_appointments_ever_set(
             status=appointment.status,
             created_at=appointment.created_at,
             updated_at=appointment.updated_at,
+            feedbacks=[
+                CompleteFeedbackInfo(**jsonable_encoder(feedback))
+                for feedback in appointment.feedbacks.all()
+            ],
         )
         for appointment in appointments
     ]
@@ -522,6 +655,30 @@ def delete_appointment(
         appointment = Appointment.objects.get(pk=id, patient=patient)
         appointment.delete()
         return Feedback(**{"detail": "Appointment deleted successfully."})
+    except Appointment.DoesNotExist:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=f"Appointment with id {id} does not exist.",
+        )
+
+
+@router.post("/appointment/{id}/feedback", name="Add appointment feedback")
+def add_appointment_feedback(
+    patient: Annotated[Patient, Depends(get_patient)],
+    id: Annotated[int, Path(description="Appointment ID")],
+    new_feedback: NewFeedbackInfo,
+) -> CompleteFeedbackInfo:
+    try:
+        target_appointment = Appointment.objects.get(pk=id, patient=patient)
+        new_feedback = ServiceFeedback(
+            sender=patient.user,
+            message=new_feedback.message,
+            rate=new_feedback.rate.value,
+        )
+        new_feedback.save()
+        target_appointment.feedbacks.add(new_feedback)
+        target_appointment.save()
+        return CompleteFeedbackInfo.from_model(new_feedback)
     except Appointment.DoesNotExist:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,

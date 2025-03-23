@@ -1,9 +1,16 @@
-from pydantic import BaseModel, Field, field_validator, FutureDatetime
+from pydantic import BaseModel, Field, field_validator, FutureDatetime, Field, HttpUrl
 from typing import Optional, Any
 from datetime import datetime, date
 from hospital_ms.settings import MEDIA_URL
 from users.models import CustomUser
-from hospital.models import Treatment, WorkingDay, Doctor, Appointment
+from hospital.models import (
+    Treatment,
+    WorkingDay,
+    Doctor,
+    Appointment,
+    News,
+    ServiceFeedback,
+)
 from os import path
 
 
@@ -32,6 +39,51 @@ class Feedback(BaseModel):
         json_schema_extra = {
             "example": {"detail": "This is a detailed feedback message."}
         }
+
+
+class NewFeedbackInfo(BaseModel):
+    message: str
+    rate: ServiceFeedback.FeedbackRate
+
+
+class UpdateFeedbackInfo(BaseModel):
+    message: Optional[str] = None
+    rate: Optional[ServiceFeedback.FeedbackRate] = None
+
+
+class CompleteFeedbackInfo(NewFeedbackInfo):
+    id: int
+    created_at: datetime
+    updated_at: datetime
+
+    @classmethod
+    def from_model(cls, obj: ServiceFeedback):
+        assert isinstance(
+            obj, ServiceFeedback
+        ), f"Obj must be an instance of {ServiceFeedback} not {type(obj)}"
+        cls.id = obj.id
+        cls.message = obj.message
+        cls.rate = obj.rate
+        cls.created_at = obj.created_at
+        cls.updated_at = obj.updated_at
+        return cls
+
+
+class UserFeedback(CompleteFeedbackInfo):
+    class UserInfo(BaseModel):
+        username: str
+        first_name: Optional[str] = None
+        last_name: Optional[str] = None
+        role: CustomUser.UserRole
+        profile: Optional[str]
+
+        @field_validator("profile")
+        def validate_cover_photo(value):
+            if value and not value.startswith("/"):
+                return path.join(MEDIA_URL, value)
+            return value
+
+    user: UserInfo
 
 
 class EditablePersonalData(BaseModel):
@@ -171,6 +223,7 @@ class PatientTreatment(ShallowPatientTreatment):
     total_medicine_bill: float
     total_treatment_bill: float
     extra_fees: list[ExtraFees]
+    feedbacks: list[CompleteFeedbackInfo]
     updated_at: datetime
 
     class Config:
@@ -336,6 +389,7 @@ class AppointmentDetails(UpdateAppointmentWithDoctor):
 class AvailableAppointmentWithDoctor(AppointmentDetails):
     id: int
     appointment_datetime: datetime
+    feedbacks: list[CompleteFeedbackInfo]
 
     class Config:
         json_schema_extra = {
@@ -425,16 +479,11 @@ class SendMPESAPopupTo(BaseModel):
         }
 
 
-class ServiceFeedbackInfo(BaseModel):
-    # message
-    pass
-
-
 class HospitalGallery(BaseModel):
     title: str
     details: str
     location_name: str
-    video_link: Optional[str] = None
+    video_link: Optional[HttpUrl] = Field(None, description="Youtube video link")
     picture: Optional[str] = None
     date: date
 
@@ -445,7 +494,7 @@ class HospitalGallery(BaseModel):
         return value
 
 
-class HospitalInfo(BaseModel):
+class HospitalAbout(BaseModel):
     name: str
     short_name: str
     details: str
@@ -498,3 +547,32 @@ class HospitalInfo(BaseModel):
                 "wallpaper": "/media/hospital/wallpaper.jpg",
             }
         }
+
+
+class ShallowHospitalNews(BaseModel):
+    id: int
+    title: str
+    category: News.NewsCategory
+    summary: str
+    cover_photo: Optional[str]
+    created_at: datetime
+    views: int
+
+    @field_validator("cover_photo")
+    def validate_cover_photo(value):
+        if value and not value.startswith("/"):
+            return path.join(MEDIA_URL, value)
+        return value
+
+
+class HospitalNews(ShallowHospitalNews):
+    content: str
+    document: Optional[str] = None
+    video_link: Optional[HttpUrl] = Field(None, description="Youtube video link")
+    updated_at: datetime
+
+    @field_validator("document")
+    def validate_document(value):
+        if value and not value.startswith("/"):
+            return path.join(MEDIA_URL, value)
+        return value
