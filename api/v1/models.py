@@ -45,10 +45,26 @@ class NewFeedbackInfo(BaseModel):
     message: str
     rate: ServiceFeedback.FeedbackRate
 
+    class Config:
+        json_schema_extra = {
+            "example": {
+                "message": "Great service!",
+                "rate": "Excellent",
+            }
+        }
+
 
 class UpdateFeedbackInfo(BaseModel):
     message: Optional[str] = None
     rate: Optional[ServiceFeedback.FeedbackRate] = None
+
+    class Config:
+        json_schema_extra = {
+            "example": {
+                "message": "Good service.",
+                "rate": "Good",
+            }
+        }
 
 
 class CompleteFeedbackInfo(NewFeedbackInfo):
@@ -68,6 +84,17 @@ class CompleteFeedbackInfo(NewFeedbackInfo):
         cls.updated_at = obj.updated_at
         return cls
 
+    class Config:
+        json_schema_extra = {
+            "example": {
+                "id": 1,
+                "message": "Great service!",
+                "rate": "Excellent",
+                "created_at": "2023-01-01T00:00:00",
+                "updated_at": "2023-01-02T00:00:00",
+            }
+        }
+
 
 class UserFeedback(CompleteFeedbackInfo):
     class UserInfo(BaseModel):
@@ -83,7 +110,36 @@ class UserFeedback(CompleteFeedbackInfo):
                 return path.join(MEDIA_URL, value)
             return value
 
+        class Config:
+            json_schema_extra = {
+                "example": {
+                    "username": "johndoe",
+                    "first_name": "John",
+                    "last_name": "Doe",
+                    "role": "Patient",
+                    "profile": "/media/custom_user/profile.jpg",
+                }
+            }
+
     user: UserInfo
+
+    class Config:
+        json_schema_extra = {
+            "example": {
+                "id": 1,
+                "message": "Great service!",
+                "rate": "Excellent",
+                "created_at": "2023-01-01T00:00:00",
+                "updated_at": "2023-01-02T00:00:00",
+                "user": {
+                    "username": "johndoe",
+                    "first_name": "John",
+                    "last_name": "Doe",
+                    "role": "Patient",
+                    "profile": "/media/custom_user/profile.jpg",
+                },
+            }
+        }
 
 
 class EditablePersonalData(BaseModel):
@@ -258,6 +314,15 @@ class PatientTreatment(ShallowPatientTreatment):
                 "extra_fees": [
                     {"name": "X-ray", "details": "Chest X-ray", "amount": 50.0}
                 ],
+                "feedbacks": [
+                    {
+                        "id": 1,
+                        "message": "Great service!",
+                        "rate": "Excellent",
+                        "created_at": "2023-01-01T00:00:00",
+                        "updated_at": "2023-01-02T00:00:00",
+                    },
+                ],
                 "updated_at": "2023-01-02T00:00:00",
             }
         }
@@ -402,6 +467,15 @@ class AvailableAppointmentWithDoctor(AppointmentDetails):
                 "appointment_charges": 100.0,
                 "created_at": "2023-01-01T00:00:00",
                 "updated_at": "2023-01-02T00:00:00",
+                "feedbacks": [
+                    {
+                        "id": 1,
+                        "message": "Great service!",
+                        "rate": "Excellent",
+                        "created_at": "2023-01-01T00:00:00",
+                        "updated_at": "2023-01-02T00:00:00",
+                    }
+                ],
             }
         }
 
