@@ -567,6 +567,18 @@ class HospitalGallery(BaseModel):
             return path.join(MEDIA_URL, value)
         return value
 
+    class Config:
+        json_schema_extra = {
+            "example": {
+                "title": "Hospital Tour",
+                "details": "A virtual tour of our hospital facilities.",
+                "location_name": "Main Hospital",
+                "video_link": "https://www.youtube.com/watch?v=dQw4w9WgXcQ",
+                "picture": "/media/gallery/hospital-tour.jpg",
+                "date": "2023-01-01",
+            }
+        }
+
 
 class HospitalAbout(BaseModel):
     name: str
@@ -638,6 +650,19 @@ class ShallowHospitalNews(BaseModel):
             return path.join(MEDIA_URL, value)
         return value
 
+    class Config:
+        json_schema_extra = {
+            "example": {
+                "id": 1,
+                "title": "New Wing Inauguration",
+                "category": "Announcement",
+                "summary": "We are excited to announce the inauguration of our new wing.",
+                "cover_photo": "/media/news/new-wing.jpg",
+                "created_at": "2023-01-01T00:00:00",
+                "views": 100,
+            }
+        }
+
 
 class HospitalNews(ShallowHospitalNews):
     content: str
@@ -650,3 +675,20 @@ class HospitalNews(ShallowHospitalNews):
         if value and not value.startswith("/"):
             return path.join(MEDIA_URL, value)
         return value
+
+    class Config:
+        json_schema_extra = {
+            "example": {
+                "id": 1,
+                "title": "New Wing Inauguration",
+                "category": "Announcement",
+                "summary": "We are excited to announce the inauguration of our new wing.",
+                "cover_photo": "/media/news/new-wing.jpg",
+                "created_at": "2023-01-01T00:00:00",
+                "views": 100,
+                "content": "The new wing includes state-of-the-art facilities...",
+                "document": "/media/news/new-wing-doc.pdf",
+                "video_link": "https://www.youtube.com/watch?v=dQw4w9WgXcQ",
+                "updated_at": "2023-01-02T00:00:00",
+            }
+        }
