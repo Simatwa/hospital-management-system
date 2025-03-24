@@ -135,9 +135,9 @@ DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
 AUTH_USER_MODEL = "users.CustomUser"
 
-FRONTEND_DIR = Path(
-    "/home/smartwa/Projects/hms/project/dist"
-)  # BASE_DIR / "frontend/dist.ready"
+FRONTEND_DIR = (
+    BASE_DIR / "frontend/dist.ready"
+)  # Path( "/home/smartwa/Projects/hms/project/dist")  #
 
 JAZZMIN_SETTINGS = {
     "show_ui_builder": True,
@@ -191,20 +191,20 @@ JAZZMIN_SETTINGS = {
     },
 }
 
-JAZZMIN_UI_TWEAKS = {
+JAZZMIN_UI_TWEAKS = JAZZMIN_UI_TWEAKS = JAZZMIN_UI_TWEAKS = {
     "navbar_small_text": False,
     "footer_small_text": False,
     "body_small_text": False,
     "brand_small_text": False,
-    "brand_colour": "navbar-danger",
-    "accent": "accent-orange",
-    "navbar": "navbar-danger navbar-dark",
+    "brand_colour": "navbar-primary",
+    "accent": "accent-primary",
+    "navbar": "navbar-primary navbar-dark",
     "no_navbar_border": False,
     "navbar_fixed": True,
     "layout_boxed": False,
     "footer_fixed": False,
     "sidebar_fixed": True,
-    "sidebar": "sidebar-dark-danger",
+    "sidebar": "sidebar-dark-teal",
     "sidebar_nav_small_text": False,
     "sidebar_disable_expand": False,
     "sidebar_nav_child_indent": False,

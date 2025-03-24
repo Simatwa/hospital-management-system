@@ -1,2 +1,4 @@
 # hospital-management-system
-Appointment scheduling, record's management &amp; patients portal system for a better health.
+Appointment scheduling, record's management &amp; patients portal system all for a better health.
+
+# Features
