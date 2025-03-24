@@ -46,7 +46,7 @@ MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
     "django.middleware.common.CommonMiddleware",
-    "django.middleware.csrf.CsrfViewMiddleware",
+    #"django.middleware.csrf.CsrfViewMiddleware",
     "django.contrib.auth.middleware.AuthenticationMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
@@ -135,7 +135,7 @@ DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
 AUTH_USER_MODEL = "users.CustomUser"
 
-FRONTEND_DIR = None  # BASE_DIR / "frontend/dist.ready"
+FRONTEND_DIR = Path("/home/smartwa/Projects/hms/project/dist")  # BASE_DIR / "frontend/dist.ready"
 
 JAZZMIN_SETTINGS = {
     "show_ui_builder": True,

@@ -422,7 +422,7 @@ def get_specific_treatment_details(
         else:
             raise HTTPException(
                 status_code=status.HTTP_403_FORBIDDEN,
-                details="You can only access your own treatment details.",
+                detail="You can only access your own treatment details.",
             )
     except Treatment.DoesNotExist:
         raise HTTPException(

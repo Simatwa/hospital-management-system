@@ -515,6 +515,9 @@ class ServiceFeedback(models.Model):
         verbose_name=_("Created At"),
     )
 
+    def __str__(self):
+        return f"{self.rate} feedback from {self.sender}"
+
 
 class Treatment(models.Model):
     class PatientType(Enum):

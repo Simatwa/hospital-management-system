@@ -11,12 +11,13 @@ class CustomUserCreationForm(forms.ModelForm):
         fields = [
             "first_name",
             "last_name",
+            "username",
             "phone_number",
             "email",
             "date_of_birth",
             "location",
             "password",
-            "profile",
+            #"profile",
         ]
 
     def clean_password(self):
