@@ -17,7 +17,7 @@ class CustomUserCreationForm(forms.ModelForm):
             "date_of_birth",
             "location",
             "password",
-            #"profile",
+            # "profile",
         ]
 
     def clean_password(self):

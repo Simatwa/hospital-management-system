@@ -304,7 +304,7 @@ def get_doctors_available(
     return available_doctors_list
 
 
-@router.get("/doctor{id}", name="Details of specific doctor")
+@router.get("/doctor/{id}", name="Details of specific doctor")
 def get_specific_doctor_details(
     id: Annotated[int, Path(description="Doctor ID")]
 ) -> DoctorDetails:
@@ -559,6 +559,10 @@ def set_new_appointment(
                     status=appointment.status,
                     created_at=appointment.created_at,
                     updated_at=appointment.updated_at,
+                    feedbacks=[
+                        CompleteFeedbackInfo(**jsonable_encoder(feedback))
+                        for feedback in appointment.feedbacks.all()
+                    ],
                 )
             else:
                 raise HTTPException(
@@ -633,6 +637,10 @@ def update_existing_appointment(
             status=appointment.status,
             created_at=appointment.created_at,
             updated_at=appointment.updated_at,
+            feedbacks=[
+                CompleteFeedbackInfo(**jsonable_encoder(feedback))
+                for feedback in appointment.feedbacks.all()
+            ],
         )
     except Appointment.DoesNotExist:
         raise HTTPException(
@@ -715,4 +723,4 @@ def send_mpesa_popup_to(
         """To be implemented"""
 
     send_popup(popup_to.phone_number, popup_to.amount)
-    return Feedback(detail="Mpesa popup sent successfully.")
+    return Feedback(detail="M-pesa popup sent successfully.")

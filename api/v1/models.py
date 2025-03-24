@@ -417,8 +417,8 @@ class NewAppointmentWithDoctor(BaseModel):
 
 
 class UpdateAppointmentWithDoctor(NewAppointmentWithDoctor):
-    status: Appointment.AppointmentStatus
-    appointment_datetime: datetime
+    status: Optional[Appointment.AppointmentStatus] = None
+    appointment_datetime: Optional[datetime] = None
 
     class Config:
         json_schema_extra = {
