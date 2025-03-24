@@ -1,4 +1,4 @@
-# Hospital Management System
+<h1 align="center">Hospital Management System <img src="hospital/static/hospital/img/logo.png" width="48px"/> </h1>
 
 A comprehensive system for appointment scheduling, patient record management, and a patient portal, all designed to improve healthcare efficiency.
 
@@ -61,11 +61,18 @@ python -m fastapi run api
 - **Redoc Documentation**: `/api/redoc`
 - **Admin Panel**: `/d/admin`
 
-## License
+## Acknowledgement
 
-This project is licensed under the [MIT License](LICENSE).
-
+I acknowledge the members of my group, **Vanguard**, for their effort in partially financing this project and for being patient enough to see our cool idea turn into a reality.
 
 ## Dedication
 
-I dearly dedicate this work to my group members (The Vanguard) for financing the whole process.
+I dearly dedicate this work to all hospitals in my ancestral continent, **Africa**, in a bid to push the narrative that access to quality health facilities should be universal—because indeed, it should.
+
+## Collaboration
+
+Contributions are always welcome! Feel free to fix any issues in the code or implement new features to improve the HMS. Fork the repository, make your changes, and submit a pull request. If it's a good one, I'll be sure to merge it!
+
+## License
+
+This project is licensed under the [MIT License](LICENSE).
