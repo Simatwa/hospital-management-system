@@ -10,7 +10,8 @@ setup:
 
 	python manage.py migrate
 
-	python manage.py collectstatic
+	python manage.py collectstatic --no-input
+
 
 developmentsuperuser:
 	python manage.py createsuperuser --username developer \
