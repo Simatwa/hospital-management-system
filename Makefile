@@ -1,6 +1,6 @@
 .PHONY: install setup developmentsuperuser runserver runserver-prod default
 
-default: install setup developmentsuperuser runserver
+default: install setup developmentsuperuser runserver-api
 
 install:
 	pip install -r requirements.txt
