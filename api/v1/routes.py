@@ -168,6 +168,20 @@ def update_personal_info(
     )
 
 
+@router.get("/user/exists", name="Check if username exists")
+def check_if_username_exists(
+    username: Annotated[str, Query(description="Username to check against")]
+) -> Feedback:
+    """Checks if account with a particular username exists
+        - Useful when setting username at account creation
+    """
+    try:
+        CustomUser.objects.get(username=username)
+        return Feedback(detail=True)
+    except CustomUser.DoesNotExist:
+        return Feedback(detail=False)
+
+
 @router.get("/about", name="Details about hospital")
 def get_hospital_details() -> HospitalAbout:
     return HospitalAbout(**jsonable_encoder(About.objects.all().first()))
@@ -720,7 +734,7 @@ def send_mpesa_popup_to(
     patient: Annotated[Patient, Depends(get_patient)], popup_to: SendMPESAPopupTo
 ) -> Feedback:
     def send_popup(phone_number, amount):
-        """To be implemented"""
+        """TODO: Request payment using Daraja API"""
 
     send_popup(popup_to.phone_number, popup_to.amount)
     return Feedback(detail="M-pesa popup sent successfully.")

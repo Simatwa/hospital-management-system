@@ -33,7 +33,7 @@ class TokenAuth(BaseModel):
 
 
 class Feedback(BaseModel):
-    detail: str = Field(description="Feedback in details")
+    detail: Any = Field(description="Feedback in details")
 
     class Config:
         json_schema_extra = {

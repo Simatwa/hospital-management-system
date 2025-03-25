@@ -68,6 +68,13 @@ class About(models.Model):
         blank=True,
         default="admin@hospital.com",
     )
+    phone_number = models.CharField(
+        max_length=50,
+        help_text="Hospital's hotline number",
+        null=True,
+        blank=True,
+        default="0200000000",
+    )
     facebook = models.URLField(
         max_length=100,
         help_text=_("Hospital's Facebook profile link"),
@@ -709,6 +716,15 @@ class Appointment(models.Model):
             self.patient.user.account.save()
 
         super().save(*args, **kwargs)
+
+    def delete(self, *args, **kwargs):
+        if self.status != self.AppointmentStatus.COMPLETED.value:
+            # Debit user account
+            self.patient.user.account.balance += (
+                self.doctor.speciality.appointment_charges
+            )
+            self.patient.user.account.save()
+        super().delete(*args, **kwargs)
 
     def __str__(self):
         return f"{self.patient} with {self.doctor} on {self.appointment_datetime.strftime("%d-%b-%Y %H:%M:%S")}"

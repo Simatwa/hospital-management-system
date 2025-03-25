@@ -54,12 +54,16 @@ python manage.py createsuperuser --username developer --email developer@localhos
 python -m fastapi run api
 ```
 
-## API Endpoints
+## Site Endpoints
 
 - **Home Page**: `/`
 - **API Documentation**: `/api/docs`
 - **Redoc Documentation**: `/api/redoc`
 - **Admin Panel**: `/d/admin`
+
+> [!IMPORTANT]
+> Admin username : `developer`.
+> Password: `development`
 
 ## Acknowledgement
 
