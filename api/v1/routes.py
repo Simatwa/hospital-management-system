@@ -750,6 +750,10 @@ def send_mpesa_popup_to(
             amount=popup_to.amount,
             account_reference=account_number,
         )
+        # Push send successfully let's SIMULATE account debitting
+        # TODO: Implement a real account debition.
+        patient.user.account.balance += amount
+        patient.user.account.save()
 
     send_popup(popup_to.phone_number, popup_to.amount)
     return Feedback(detail="M-pesa popup sent successfully.")
