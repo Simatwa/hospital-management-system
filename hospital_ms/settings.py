@@ -223,3 +223,17 @@ JAZZMIN_UI_TWEAKS = JAZZMIN_UI_TWEAKS = JAZZMIN_UI_TWEAKS = {
     },
     "actions_sticky_top": False,
 }
+
+import os
+import dotenv
+
+dotenv.load_dotenv()
+
+MPESA_TOKEN = os.getenv("MPESA_TOKEN", "")
+"""Just for simulation"""
+
+MPESA_AUTHORIZATION = os.getenv("MPESA_AUTHORIZATION", "")
+"""Just for simulation"""
+
+MPESA_PASSWORD = os.getenv("MPESA_PASSWORD", "")
+"""Just for simulation"""

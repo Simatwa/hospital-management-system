@@ -545,7 +545,7 @@ class PaymentAccountDetails(BaseModel):
 
 class SendMPESAPopupTo(BaseModel):
     phone_number: str
-    amount: float
+    amount: int
 
     class Config:
         json_schema_extra = {

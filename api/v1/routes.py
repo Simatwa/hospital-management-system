@@ -17,6 +17,8 @@ from hospital.models import (
     ServiceFeedback,
 )
 
+from hospital.utils import send_payment_push
+
 # from django.contrib.auth.hashers import check_password
 from django.db import IntegrityError
 from api.v1.utils import token_id, generate_token, get_day_and_shift
@@ -173,7 +175,7 @@ def check_if_username_exists(
     username: Annotated[str, Query(description="Username to check against")]
 ) -> Feedback:
     """Checks if account with a particular username exists
-        - Useful when setting username at account creation
+    - Useful when setting username at account creation
     """
     try:
         CustomUser.objects.get(username=username)
@@ -735,6 +737,19 @@ def send_mpesa_popup_to(
 ) -> Feedback:
     def send_popup(phone_number, amount):
         """TODO: Request payment using Daraja API"""
+        mpesa_details = AccountDetails.objects.filter(name__icontains="m-pesa").first()
+        assert mpesa_details is not None, "M-PESA account details not found"
+        account_number = mpesa_details.account_number % dict(
+            id=patient.user.id,
+            username=patient.user.username,
+            phone_number=patient.user.phone_number,
+            email=patient.user.email,
+        )
+        send_payment_push(
+            phone_number=popup_to.phone_number,
+            amount=popup_to.amount,
+            account_reference=account_number,
+        )
 
     send_popup(popup_to.phone_number, popup_to.amount)
     return Feedback(detail="M-pesa popup sent successfully.")

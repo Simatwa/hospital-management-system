@@ -777,7 +777,7 @@ class News(models.Model):
         def choices(cls):
             return [(key.value, key.name) for key in cls]
 
-    title = models.CharField(max_length=40, help_text=_("News title"))
+    title = models.CharField(max_length=80, help_text=_("News title"))
     category = models.CharField(
         max_length=20,
         choices=NewsCategory.choices(),

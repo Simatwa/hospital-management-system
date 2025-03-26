@@ -43,7 +43,12 @@ class AboutAdmin(admin.ModelAdmin):
         ),
         (
             _("Contact"),
-            {"fields": ("phone_number", "email",)},
+            {
+                "fields": (
+                    "phone_number",
+                    "email",
+                )
+            },
         ),
         (
             _("Social Media"),
