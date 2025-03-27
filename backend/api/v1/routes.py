@@ -6,16 +6,11 @@ from hospital.models import (
     Patient,
     Treatment,
     Appointment,
-    Doctor,
-    Speciality,
-    Department,
-    AccountDetails,
-    Gallery,
-    About,
-    News,
-    Subscriber,
-    ServiceFeedback,
 )
+from staffing.models import Doctor, Speciality, Department
+from finance.models import Account
+
+from external.models import Gallery, About, News, Subscriber, ServiceFeedback
 
 from hospital.utils import send_payment_push
 
@@ -729,7 +724,7 @@ def get_payment_account_details(
             ),
             details=account.details,
         )
-        for account in AccountDetails.objects.filter(is_active=True).all()
+        for account in Account.objects.filter(is_active=True).all()
     ]
 
 
@@ -739,7 +734,7 @@ def send_mpesa_popup_to(
 ) -> Feedback:
     def send_popup(phone_number, amount):
         """TODO: Request payment using Daraja API"""
-        mpesa_details = AccountDetails.objects.filter(name__icontains="m-pesa").first()
+        mpesa_details = Account.objects.filter(name__icontains="m-pesa").first()
         assert mpesa_details is not None, "M-PESA account details not found"
         account_number = mpesa_details.account_number % dict(
             id=patient.user.id,

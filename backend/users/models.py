@@ -9,30 +9,12 @@ from datetime import datetime
 from django.core.validators import RegexValidator
 
 # Create your models here.
+from finance.models import UserAccount
 
 
 def generate_profile_filepath(instance: "CustomUser", filename: str) -> str:
     custom_filename = str(uuid4()) + path.splitext(filename)[1]
     return f"user_profile/{instance.id}{custom_filename}"
-
-
-class Account(models.Model):
-    balance = models.DecimalField(
-        max_digits=8, decimal_places=2, help_text=_("Account balance"), default=0
-    )
-    updated_at = models.DateTimeField(
-        auto_now=True,
-        verbose_name=_("Updated At"),
-        help_text=_("The date and time when the account was last updated"),
-    )
-    created_at = models.DateTimeField(
-        auto_now_add=True,
-        verbose_name=_("Created At"),
-        help_text=_("The date and time when the aaccount was created"),
-    )
-
-    def __str__(self):
-        return str(self.balance)
 
 
 class CustomUser(AbstractUser):
@@ -116,7 +98,7 @@ class CustomUser(AbstractUser):
     )
 
     account = models.OneToOneField(
-        Account,
+        UserAccount,
         on_delete=models.RESTRICT,
         help_text=_("Finance account"),
         related_name="user",
@@ -129,7 +111,7 @@ class CustomUser(AbstractUser):
     def save(self, *args, **kwargs):
         if not self.id:  # new entry
             # self.set_password(self.password)
-            new_account = Account.objects.create()
+            new_account = UserAccount.objects.create()
             new_account.save()
             self.account = new_account
         super().save(*args, **kwargs)
@@ -147,51 +129,3 @@ class CustomUser(AbstractUser):
 
     def __str__(self):
         return self.username
-
-
-class Payment(models.Model):
-    class PaymentMethod(str, Enum):
-        CASH = "Cash"
-        MPESA = "m-pesa"
-        BANK = "Bank"
-        OTHER = "Other"
-
-        @classmethod
-        def choices(cls):
-            return [(key.name, key.value) for key in cls]
-
-    user = models.ForeignKey(
-        CustomUser,
-        verbose_name=_("Patient"),
-        on_delete=models.CASCADE,
-        help_text=_("User account to deposit to."),
-        related_name="payments",
-    )
-
-    amount = models.DecimalField(
-        max_digits=10, decimal_places=2, help_text=_("Transaction amount in Ksh")
-    )
-    method = models.CharField(
-        max_length=20,
-        choices=PaymentMethod.choices(),
-        default=PaymentMethod.MPESA.value,
-        help_text=_("Select means of payment"),
-    )
-    reference = models.CharField(
-        max_length=100, help_text=_("Transaction ID or -- for cash.")
-    )
-    created_at = models.DateTimeField(
-        auto_now_add=True,
-        verbose_name=_("Created At"),
-        help_text=_("The date and time when the order was created"),
-    )
-
-    def __str__(self):
-        return f"Amount Ksh.{self.amount} via {self.method} (Ref: {self.reference})"
-
-    def save(self, *args, **kwargs):
-        if self.id:
-            raise Exception("Payments cannot be edited")
-        self.user.account.balance += self.amount
-        self.user.account.save()
-        super().save(*args, **kwargs)

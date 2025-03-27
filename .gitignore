@@ -178,7 +178,10 @@ vendor
 user_profile
 document
 migrations
-/files/static/
+gallery
+news
+about
+/backend/files/static/
 node_modules
 .bolt
 medicine

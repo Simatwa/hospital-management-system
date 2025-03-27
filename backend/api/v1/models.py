@@ -5,12 +5,10 @@ from hospital_ms.settings import MEDIA_URL
 from users.models import CustomUser
 from hospital.models import (
     Treatment,
-    WorkingDay,
-    Doctor,
     Appointment,
-    News,
-    ServiceFeedback,
 )
+from staffing.models import WorkingDay, Doctor
+from external.models import News, ServiceFeedback
 from os import path
 
 

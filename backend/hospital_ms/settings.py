@@ -33,6 +33,9 @@ ALLOWED_HOSTS = ["*"]
 INSTALLED_APPS = [
     "jazzmin",
     "users.apps.UsersConfig",
+    "finance.apps.FinanceConfig",
+    "external.apps.ExternalConfig",
+    "staffing.apps.StaffingConfig",
     "hospital.apps.HospitalConfig",
     "django.contrib.admin",
     "django.contrib.auth",
@@ -136,7 +139,7 @@ DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 AUTH_USER_MODEL = "users.CustomUser"
 
 FRONTEND_DIR = (
-    BASE_DIR / "frontend/dist.ready"
+    BASE_DIR / "../frontend/dist.ready"
 )  # Path( "/home/smartwa/Projects/hms/project/dist")  #
 
 JAZZMIN_SETTINGS = {
@@ -170,24 +173,24 @@ JAZZMIN_SETTINGS = {
         "auth": "fas fa-users-cog",
         "auth.Group": "fas fa-users",
         "users.CustomUser": "fas fa-user",
-        "users.Payment": "fas fa-money-bill-wave",
-        "users.Account": "fas fa-wallet",
-        "hospital.WorkingDay": "fas fa-calendar-day",
-        "hospital.Department": "fas fa-building",
-        "hospital.Speciality": "fas fa-stethoscope",
+        "finance.Payment": "fas fa-money-bill-wave",
+        "finance.UserAccount": "fas fa-wallet",
+        "finance.ExtraFee": "fas fa-dollar-sign",
+        "finance.Account": "fas fa-file-invoice-dollar",
+        "staffing.WorkingDay": "fas fa-calendar-day",
+        "staffing.Department": "fas fa-building",
+        "staffing.Speciality": "fas fa-stethoscope",
+        "staffing.Doctor": "fas fa-user-md",
         "hospital.Medicine": "fas fa-pills",
-        "hospital.Doctor": "fas fa-user-md",
         "hospital.Patient": "fas fa-procedures",
         "hospital.Treatment": "fas fa-briefcase-medical",
         "hospital.Appointment": "fas fa-calendar-check",
         "hospital.TreatmentMedicine": "fas fa-capsules",
-        "hospital.ExtraFee": "fas fa-dollar-sign",
-        "hospital.AccountDetails": "fas fa-file-invoice-dollar",
-        "hospital.ServiceFeedback": "fas fa-comments",
-        "hospital.Gallery": "fas fa-images",
-        "hospital.About": "fas fa-info-circle",
-        "hospital.News": "fas fa-newspaper",
-        "hospital.Subscriber": "fas fa-user-plus",
+        "external.ServiceFeedback": "fas fa-comments",
+        "external.Gallery": "fas fa-images",
+        "external.About": "fas fa-info-circle",
+        "external.News": "fas fa-newspaper",
+        "external.Subscriber": "fas fa-user-plus",
     },
 }
 

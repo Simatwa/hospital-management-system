@@ -1,6 +1,7 @@
 import re
 import requests
 import datetime
+from os import path
 from hospital_ms import settings
 
 headers = {"Accept": "*/*"}
@@ -34,6 +35,11 @@ def send_payment_push(phone_number: str, amount: int, account_reference: str):
     }
     resp = requests.post(url=url, json=payload, headers=headers)
     resp.raise_for_status()
+
+
+def generate_document_filepath(instance, filename: str) -> str:
+    filename, extension = path.splitext(filename)
+    return f"{instance.__class__.__name__.lower()}/{filename}_{instance.id or ''}{extension}"
 
 
 if __name__ == "__main__":

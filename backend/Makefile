@@ -6,7 +6,7 @@ install:
 	pip install -r requirements.txt
 
 setup:
-	python manage.py makemigrations users hospital
+	python manage.py makemigrations users hospital finance external staffing
 
 	python manage.py migrate
 
