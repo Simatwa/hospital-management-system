@@ -42,7 +42,7 @@ Follow these steps to set up the project:
 
 ```sh
 git clone https://github.com/Simatwa/hospital-management-system.git
-cd hospital-management-system
+cd hospital-management-system/backend
 pip install virtualenv # Incase it's not installed
 
 # Create and activate virtual environment
