@@ -1,4 +1,4 @@
-<h1 align="center">Hospital Management System <img src="hospital/static/hospital/img/logo.png" width="48px"/> </h1>
+<h1 align="center">Hospital Management System <img src="backend/hospital/static/hospital/img/logo.png" width="48px"/> </h1>
 
 <p align="center">
 <a href=""><img alt="Backend Admin - Django" src="https://img.shields.io/static/v1?logo=django&color=Blue&message=Admin&label=Django"/></a>
