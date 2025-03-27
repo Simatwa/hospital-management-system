@@ -2,4 +2,5 @@ django==5.1.7
 django-jazzmin==3.0.1
 fastapi[standard]==0.115.11
 pillow==11.1.0
-python-dotenv
+python-dotenv==1.0.0
+pymysql==1.1.1

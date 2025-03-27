@@ -10,6 +10,11 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/5.1/ref/settings/
 """
 
+import os
+import dotenv
+
+dotenv.load_dotenv()
+
 from pathlib import Path
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -79,10 +84,22 @@ WSGI_APPLICATION = "hospital_ms.wsgi.application"
 # Database
 # https://docs.djangoproject.com/en/5.1/ref/settings/#databases
 
+try:
+    import pymysql
+
+    pymysql.install_as_MySQLdb()
+except ImportError:
+    # Still okay maybe other engines are set.
+    pass
+
 DATABASES = {
     "default": {
-        "ENGINE": "django.db.backends.sqlite3",
-        "NAME": BASE_DIR / "db.sqlite3",
+        "ENGINE": os.getenv("DATABASE_ENGINE", "django.db.backends.sqlite3"),
+        "NAME": os.getenv("DATABASE_NAME", BASE_DIR / "db.sqlite3"),
+        "USER": os.getenv("DATABASE_USER", "developer"),
+        "PASSWORD": os.getenv("DATABASE_PASSWORD", "development"),
+        "HOST": os.getenv("DATABASE_HOST", "localhost"),
+        "PORT": os.getenv("DATABASE_PORT", "3306"),
     }
 }
 
@@ -227,10 +244,6 @@ JAZZMIN_UI_TWEAKS = JAZZMIN_UI_TWEAKS = JAZZMIN_UI_TWEAKS = {
     "actions_sticky_top": False,
 }
 
-import os
-import dotenv
-
-dotenv.load_dotenv()
 
 MPESA_TOKEN = os.getenv("MPESA_TOKEN", "")
 """Just for simulation"""
