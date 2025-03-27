@@ -21,7 +21,7 @@ from hospital.utils import send_payment_push
 
 # from django.contrib.auth.hashers import check_password
 from django.db import IntegrityError
-from api.v1.utils import token_id, generate_token, get_day_and_shift
+from api.v1.utils import token_id, generate_token, get_day_and_shift, markdown_to_html
 from api.v1.models import (
     TokenAuth,
     Profile,
@@ -167,6 +167,7 @@ def update_personal_info(
         phone_number=user.phone_number,
         email=user.email,
         location=user.location,
+        bio=user.bio,
     )
 
 
@@ -215,6 +216,7 @@ def get_published_news_details(
         target_news = News.objects.get(pk=id, is_published=True)
         target_news_dict = jsonable_encoder(target_news)
         target_news.views += 1
+        target_news_dict["content"] = markdown_to_html(target_news.content)
         target_news_dict["views"] += 1
         target_news.save()
         return HospitalNews(**target_news_dict)

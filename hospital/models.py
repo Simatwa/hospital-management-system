@@ -13,7 +13,7 @@ from django.utils import timezone
 
 def generate_document_filepath(instance: "Medicine", filename: str) -> str:
     filename, extension = path.splitext(filename)
-    return f"{instance.__class__.__name__.lower()}/{filename}_{instance.id}{extension}"
+    return f"{instance.__class__.__name__.lower()}/{filename}_{instance.id or ''}{extension}"
 
 
 class About(models.Model):
