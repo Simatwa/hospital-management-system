@@ -25,12 +25,14 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/5.1/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = "django-insecure-r5#6f#%e5m@d1wc#&7(pxa_kxdwk!_qmki)f9i=!l37sjo*kv_"
+SECRET_KEY = os.getenv(
+    "SECRET_KEY", "django-insecure-r5#6f#%e5m@d1wc#&7(pxa_kxdwk!_qmki)f9i=!l37sjo*kv_"
+)
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = os.getenv("DEBUG", "0") == "1"
 
-ALLOWED_HOSTS = ["*"]
+ALLOWED_HOSTS = [host.strip() for host in os.getenv("ALLOWED_HOSTS", "*").split(",")]
 
 
 # Application definition
@@ -159,15 +161,17 @@ FRONTEND_DIR = (
     BASE_DIR / "../frontend/dist.ready"
 )  # Path( "/home/smartwa/Projects/hms/project/dist")  #
 
+SITE_NAME = os.getenv("SITE_NAME", "Hospital MS")
+
 JAZZMIN_SETTINGS = {
     "show_ui_builder": True,
-    "site_title": "Hospital MS",
-    "site_header": "Hospital MS",
-    "site_brand": "Hospital MS",
+    "site_title": SITE_NAME,
+    "site_header": SITE_NAME,
+    "site_brand": SITE_NAME,
     "site_logo": "hospital/img/logo.png",
     "site_logo_classes": "img-circle",
-    "welcome_sign": "Welcome to Hospital MS",
-    "copyright": "Hospital MS",
+    "welcome_sign": f"Welcome to {SITE_NAME}",
+    "copyright": SITE_NAME,
     "user_avatar": "profile",
     "topmenu_links": [
         {"name": "Home", "url": "admin:index", "permissions": ["auth.view_user"]},
@@ -211,7 +215,7 @@ JAZZMIN_SETTINGS = {
     },
 }
 
-JAZZMIN_UI_TWEAKS = JAZZMIN_UI_TWEAKS = JAZZMIN_UI_TWEAKS = {
+JAZZMIN_UI_TWEAKS = {
     "navbar_small_text": False,
     "footer_small_text": False,
     "body_small_text": False,
