@@ -4,8 +4,6 @@ from django.utils.translation import gettext_lazy as _
 from enum import Enum
 from hospital.exceptions import InsufficientMedicineStockError
 from django.db.models import Sum
-from datetime import datetime
-from django.utils import timezone
 from hospital.utils import generate_document_filepath
 
 # Create your models here.
@@ -254,13 +252,20 @@ class Treatment(models.Model):
     def save(self, *args, **kwargs):
         super().save(*args, **kwargs)
         total_bill = self.total_bill
+        # TODO: Fix: First time entry results to total bill 0
+        """
+        print("Total medicine bill : ", self.total_medicine_bill)
+        print("Total extra-fees : ", self.total_extra_fees_bill)
+        print("Total bill :", total_bill)
+        print("Settled bill :", self.bill_settled)
+        """
         if self.bill_settled != total_bill:
             # deduct from user account
             payable_amount = total_bill - self.bill_settled
             self.patient.user.account.balance -= payable_amount
             self.bill_settled = total_bill
             self.patient.user.account.save()
-        super().save(*args, **kwargs)
+            super().save(*args, **kwargs)
 
     def __str__(self):
         return f"{self.patient} - {self.diagnosis} on {self.created_at.strftime("%d-%b-%Y %H:%M:%S") if self.created_at else "now"}"
