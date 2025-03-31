@@ -1,5 +1,5 @@
 """
-Pharmacy-MS API module. Uses FastAPI.
+Hospital-MS API module. Uses FastAPI.
 """
 
 import os

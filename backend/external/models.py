@@ -125,7 +125,7 @@ class About(models.Model):
     created_at = models.DateTimeField(
         auto_now_add=True,
         verbose_name=_("Created At"),
-        help_text=_("The date and time when the treatment was created"),
+        help_text=_("The date and time when the hospital details was created"),
     )
 
     def __str__(self):
