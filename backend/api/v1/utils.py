@@ -5,6 +5,7 @@ import uuid
 import random
 from string import ascii_lowercase
 from datetime import datetime
+
 token_id = "pms_"
 
 
@@ -17,4 +18,3 @@ def get_day_and_shift(time: datetime) -> tuple[str]:
     day_of_week: str = time.strftime("%A")
     work_shift: str = "Day" if 6 <= time.hour < 18 else "Night"
     return day_of_week, work_shift
-
