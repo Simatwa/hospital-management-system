@@ -3,6 +3,7 @@ from django.utils.translation import gettext_lazy as _
 from enum import Enum
 from hospital.utils import generate_document_filepath
 from django.utils import timezone
+from ckeditor.fields import RichTextField
 
 # Create your models here.
 
@@ -222,7 +223,7 @@ class News(models.Model):
         default=NewsCategory.GENERAL.value,
         help_text=_("Select the category of the news"),
     )
-    content = models.TextField(help_text=_("News in detail"))
+    content = RichTextField(help_text=_("News in detail"))
     summary = models.TextField(help_text=_("News in brief"))
     cover_photo = models.ImageField(
         help_text=_("News cover photo"),

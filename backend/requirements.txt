@@ -4,3 +4,4 @@ fastapi[standard]==0.115.11
 pillow==11.1.0
 python-dotenv==1.0.0
 pymysql==1.1.1
+django-ckeditor==6.7.2

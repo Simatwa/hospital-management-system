@@ -5,28 +5,7 @@ import uuid
 import random
 from string import ascii_lowercase
 from datetime import datetime
-
-import markdown
-
 token_id = "pms_"
-
-markdown_extensions = [
-    "markdown.extensions.abbr",
-    "markdown.extensions.admonition",
-    "markdown.extensions.attr_list",
-    # "markdown.extensions.codehilite",
-    "markdown.extensions.def_list",
-    "markdown.extensions.extra",
-    "markdown.extensions.fenced_code",
-    "markdown.extensions.footnotes",
-    "markdown.extensions.legacy_attrs",
-    "markdown.extensions.legacy_em",
-    "markdown.extensions.meta",
-    "markdown.extensions.nl2br",
-    "markdown.extensions.sane_lists",
-    "markdown.extensions.tables",
-    "markdown.extensions.toc",
-]
 
 
 def generate_token() -> str:
@@ -39,6 +18,3 @@ def get_day_and_shift(time: datetime) -> tuple[str]:
     work_shift: str = "Day" if 6 <= time.hour < 18 else "Night"
     return day_of_week, work_shift
 
-
-def markdown_to_html(content: str) -> str:
-    return markdown.markdown(text=content, extensions=markdown_extensions)

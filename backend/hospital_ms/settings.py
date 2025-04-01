@@ -39,6 +39,7 @@ ALLOWED_HOSTS = [host.strip() for host in os.getenv("ALLOWED_HOSTS", "*").split(
 
 INSTALLED_APPS = [
     "jazzmin",
+    "ckeditor",
     "users.apps.UsersConfig",
     "finance.apps.FinanceConfig",
     "external.apps.ExternalConfig",
