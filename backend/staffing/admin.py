@@ -2,12 +2,13 @@ from django.contrib import admin
 from staffing.models import Department, WorkingDay, Speciality, Doctor
 from hospital.models import Appointment
 from django.utils.translation import gettext_lazy as _
+from import_export.admin import ImportExportModelAdmin
 
 # Register your models here.
 
 
 @admin.register(Department)
-class DepartmentAdmin(admin.ModelAdmin):
+class DepartmentAdmin(ImportExportModelAdmin):
     search_fields = ("name", "lead__username")
     list_filter = ("created_at",)
     list_editable = ("lead",)
@@ -34,7 +35,7 @@ class WorkingDayAdmin(admin.ModelAdmin):
 
 
 @admin.register(Speciality)
-class SpecialityAdmin(admin.ModelAdmin):
+class SpecialityAdmin(ImportExportModelAdmin):
     search_fields = ("name", "department__name")
     list_filter = ("updated_at", "created_at")
     list_display = (
