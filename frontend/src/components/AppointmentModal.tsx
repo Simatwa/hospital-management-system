@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { AlertCircle, Calendar, Clock, DollarSign } from 'lucide-react';
+import { AlertCircle, Calendar, Clock, CreditCard } from 'lucide-react';
 import { createAppointment, updateAppointment } from '../lib/appointments';
 import { getSpecialities, getDoctorsBySpeciality, getDoctorCharges } from '../lib/doctors';
 import toast from 'react-hot-toast';
@@ -238,10 +238,10 @@ export default function AppointmentModal({ appointment, onClose, onSuccess }: Ap
         {appointmentCharges !== null && (
           <div className="bg-gray-50 p-4 rounded-lg">
             <div className="flex items-center justify-between">
-              <div className="flex items-center gap-2 text-gray-700">
-                <DollarSign size={20} />
+                <div className="flex items-center gap-2 text-gray-700">
+                <CreditCard size={20} />
                 <span className="font-medium">Appointment Charges</span>
-              </div>
+                </div>
               <span className="text-lg font-semibold">Ksh {appointmentCharges}</span>
             </div>
           </div>

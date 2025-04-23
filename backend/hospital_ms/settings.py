@@ -259,3 +259,5 @@ MPESA_AUTHORIZATION = os.getenv("MPESA_AUTHORIZATION", "")
 
 MPESA_PASSWORD = os.getenv("MPESA_PASSWORD", "")
 """Just for simulation"""
+
+MPESA_TIMESTAMP = os.getenv("MPESA_TIMESTAMP", "")

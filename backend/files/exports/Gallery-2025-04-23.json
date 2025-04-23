@@ -1,0 +1,23 @@
+[
+    {
+        "title": "Dr. Njuguna's Office",
+        "details": "A photo of Dr. Njuguna's office, showing a comfortable waiting area with modern furniture and a friendly receptionist.",
+        "location_name": "Hospital",
+        "date": "2025-04-23",
+        "show_in_index": "1"
+    },
+    {
+        "title": "Medical Equipment Room",
+        "details": "An interior shot of the medical equipment room, showcasing various diagnostic tools and machinery used in patient care.",
+        "location_name": "Hospital",
+        "date": "2025-04-23",
+        "show_in_index": "1"
+    },
+    {
+        "title": "Reception Area",
+        "details": "A panoramic view of the hospital's main reception area, highlighting the spacious layout and welcoming atmosphere.",
+        "location_name": "Hospital",
+        "date": "2025-04-23",
+        "show_in_index": "1"
+    }
+]

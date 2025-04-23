@@ -329,7 +329,7 @@ class PatientTreatment(ShallowPatientTreatment):
 class AvailableDoctor(BaseModel):
     id: int
     fullname: str
-    speciality: str
+    speciality: Optional[str] = None
     profile: Optional[str] = None
     working_days: list[WorkingDay.DaysOfWeek]
     department_name: str

@@ -1,0 +1,522 @@
+[
+    {
+        "name": "Trauma Care",
+        "department": 1,
+        "details": "For emergency treatment of severe injuries and trauma cases.",
+        "appointment_charges": "1000.00",
+        "treatment_charges": "3000.00",
+        "appointments_limit": "15"
+    },
+    {
+        "name": "Burn Unit",
+        "department": 1,
+        "details": "Specialized care for burn victims and thermal injuries.",
+        "appointment_charges": "800.00",
+        "treatment_charges": "2500.00",
+        "appointments_limit": "18"
+    },
+    {
+        "name": "Emergency Surgery",
+        "department": 1,
+        "details": "Surgical interventions for acute emergencies.",
+        "appointment_charges": "1200.00",
+        "treatment_charges": "4000.00",
+        "appointments_limit": "12"
+    },
+    {
+        "name": "Resuscitation Team",
+        "department": 1,
+        "details": "Immediate life-saving interventions for critical patients.",
+        "appointment_charges": "600.00",
+        "treatment_charges": "1800.00",
+        "appointments_limit": "25"
+    },
+    {
+        "name": "Pediatric ER",
+        "department": 1,
+        "details": "Emergency care specifically for children and infants.",
+        "appointment_charges": "900.00",
+        "treatment_charges": "2800.00",
+        "appointments_limit": "22"
+    },
+    {
+        "name": "Coronary Artery Disease Management",
+        "department": 2,
+        "details": "Treatment for heart attacks and angina, including medication and lifestyle changes.",
+        "appointment_charges": "1300.00",
+        "treatment_charges": "9000.00",
+        "appointments_limit": "25"
+    },
+    {
+        "name": "Heart Failure Care",
+        "department": 2,
+        "details": "Management of heart failure symptoms through medication and lifestyle adjustments.",
+        "appointment_charges": "1450.00",
+        "treatment_charges": "10500.00",
+        "appointments_limit": "18"
+    },
+    {
+        "name": "Cardiac Arrhythmia Treatment",
+        "department": 2,
+        "details": "Treatment for abnormal heart rhythms, including catheter ablations and pacemaker implantations.",
+        "appointment_charges": "1550.00",
+        "treatment_charges": "12500.00",
+        "appointments_limit": "12"
+    },
+    {
+        "name": "Valve Disease Management",
+        "department": 2,
+        "details": "Care for patients with mitral valve prolapse, aortic stenosis, and other valve disorders.",
+        "appointment_charges": "1350.00",
+        "treatment_charges": "10000.00",
+        "appointments_limit": "22"
+    },
+    {
+        "name": "Congenital Heart Defects Care",
+        "department": 2,
+        "details": "Treatment for adults born with congenital heart defects, including surgical interventions.",
+        "appointment_charges": "1650.00",
+        "treatment_charges": "14000.00",
+        "appointments_limit": "15"
+    },
+    {
+        "name": "Cardiovascular Prevention",
+        "department": 2,
+        "details": "Risk factor reduction programs for patients with high cardiovascular risk.",
+        "appointment_charges": "1200.00",
+        "treatment_charges": "8000.00",
+        "appointments_limit": "30"
+    },
+    {
+        "name": "Epilepsy Management",
+        "department": 3,
+        "details": "Treatment for patients with epilepsy, including medication and lifestyle adjustments.",
+        "appointment_charges": "1100.00",
+        "treatment_charges": "7500.00",
+        "appointments_limit": "22"
+    },
+    {
+        "name": "Multiple Sclerosis Care",
+        "department": 3,
+        "details": "Management of MS symptoms through medication and rehabilitation programs.",
+        "appointment_charges": "1400.00",
+        "treatment_charges": "10000.00",
+        "appointments_limit": "12"
+    },
+    {
+        "name": "Stroke Rehabilitation",
+        "department": 3,
+        "details": "Physical therapy and cognitive training for stroke survivors.",
+        "appointment_charges": "950.00",
+        "treatment_charges": "8000.00",
+        "appointments_limit": "28"
+    },
+    {
+        "name": "Neurodegenerative Disease Management",
+        "department": 3,
+        "details": "Care for patients with Alzheimer's disease, Parkinson's disease, and other neurodegenerative conditions.",
+        "appointment_charges": "1250.00",
+        "treatment_charges": "9500.00",
+        "appointments_limit": "15"
+    },
+    {
+        "name": "Headache Management",
+        "department": 3,
+        "details": "Treatment for various types of headaches, including migraines and cluster headaches.",
+        "appointment_charges": "1050.00",
+        "treatment_charges": "7000.00",
+        "appointments_limit": "20"
+    },
+    {
+        "name": "Neuro-oncology Care",
+        "department": 3,
+        "details": "Management of brain tumors and other central nervous system cancers.",
+        "appointment_charges": "1500.00",
+        "treatment_charges": "12000.00",
+        "appointments_limit": "10"
+    },
+    {
+        "name": "Breast Cancer Treatment",
+        "department": 4,
+        "details": "Surgical, medical, and radiation therapy for breast cancer patients.",
+        "appointment_charges": "1800.00",
+        "treatment_charges": "16000.00",
+        "appointments_limit": "28"
+    },
+    {
+        "name": "Lung Cancer Care",
+        "department": 4,
+        "details": "Treatment for various stages of lung cancer, including surgery and targeted therapies.",
+        "appointment_charges": "2000.00",
+        "treatment_charges": "18000.00",
+        "appointments_limit": "20"
+    },
+    {
+        "name": "Colorectal Cancer Management",
+        "department": 4,
+        "details": "Surgical and medical treatment for colon and rectal cancers.",
+        "appointment_charges": "1900.00",
+        "treatment_charges": "17000.00",
+        "appointments_limit": "25"
+    },
+    {
+        "name": "Prostate Cancer Treatment",
+        "department": 4,
+        "details": "Surgical, radiation, and hormone therapy options for prostate cancer patients.",
+        "appointment_charges": "2200.00",
+        "treatment_charges": "20000.00",
+        "appointments_limit": "18"
+    },
+    {
+        "name": "Leukemia Care",
+        "department": 4,
+        "details": "Treatment for various types of leukemia through chemotherapy and targeted therapies.",
+        "appointment_charges": "2100.00",
+        "treatment_charges": "19000.00",
+        "appointments_limit": "22"
+    },
+    {
+        "name": "Oncology Supportive Care",
+        "department": 4,
+        "details": "Palliative care and symptom management for cancer patients.",
+        "appointment_charges": "1500.00",
+        "treatment_charges": "10000.00",
+        "appointments_limit": "30"
+    },
+    {
+        "name": "Pediatric Cardiology",
+        "department": 5,
+        "details": "Diagnosis and treatment of heart defects and cardiovascular conditions in children.",
+        "appointment_charges": "1500.00",
+        "treatment_charges": "10000.00",
+        "appointments_limit": "30"
+    },
+    {
+        "name": "Neonatal Intensive Care",
+        "department": 5,
+        "details": "Advanced care for premature infants and newborns with critical health conditions.",
+        "appointment_charges": "2000.00",
+        "treatment_charges": "15000.00",
+        "appointments_limit": "25"
+    },
+    {
+        "name": "Pediatric Neurology",
+        "department": 5,
+        "details": "Diagnosis and treatment of neurological disorders affecting children.",
+        "appointment_charges": "1800.00",
+        "treatment_charges": "12000.00",
+        "appointments_limit": "28"
+    },
+    {
+        "name": "Pediatric Surgery",
+        "department": 5,
+        "details": "Surgical procedures for various childhood conditions and injuries.",
+        "appointment_charges": "2200.00",
+        "treatment_charges": "20000.00",
+        "appointments_limit": "20"
+    },
+    {
+        "name": "Pediatric Endocrinology",
+        "department": 5,
+        "details": "Treatment of hormonal imbalances and growth disorders in children.",
+        "appointment_charges": "1900.00",
+        "treatment_charges": "13000.00",
+        "appointments_limit": "22"
+    },
+    {
+        "name": "Pediatric Respiratory Care",
+        "department": 5,
+        "details": "Treatment of respiratory issues such as asthma and chronic lung diseases in children.",
+        "appointment_charges": "2100.00",
+        "treatment_charges": "14000.00",
+        "appointments_limit": "26"
+    },
+    {
+        "name": "Child Psychiatry",
+        "department": 6,
+        "details": "Diagnosis and treatment of mental health disorders affecting children and adolescents.",
+        "appointment_charges": "1600.00",
+        "treatment_charges": "11000.00",
+        "appointments_limit": "24"
+    },
+    {
+        "name": "Psychiatric Neurology",
+        "department": 6,
+        "details": "Treatment of neurological aspects of psychiatric conditions.",
+        "appointment_charges": "1900.00",
+        "treatment_charges": "13000.00",
+        "appointments_limit": "21"
+    },
+    {
+        "name": "Addiction Psychiatry",
+        "department": 6,
+        "details": "Diagnosis and treatment of substance abuse and addiction disorders.",
+        "appointment_charges": "1800.00",
+        "treatment_charges": "12000.00",
+        "appointments_limit": "23"
+    },
+    {
+        "name": "Forensic Psychiatry",
+        "department": 6,
+        "details": "Evaluation and treatment of mentally ill offenders or those involved in legal proceedings.",
+        "appointment_charges": "2000.00",
+        "treatment_charges": "15000.00",
+        "appointments_limit": "20"
+    },
+    {
+        "name": "Geriatric Psychiatry",
+        "department": 6,
+        "details": "Diagnosis and treatment of mental health issues in older adults.",
+        "appointment_charges": "1700.00",
+        "treatment_charges": "10000.00",
+        "appointments_limit": "25"
+    },
+    {
+        "name": "Sleep Medicine",
+        "department": 6,
+        "details": "Treatment of sleep disorders and insomnia.",
+        "appointment_charges": "2200.00",
+        "treatment_charges": "14000.00",
+        "appointments_limit": "18"
+    },
+    {
+        "name": "Orthopedic Surgery",
+        "department": 8,
+        "details": "Surgical procedures for musculoskeletal disorders and injuries.",
+        "appointment_charges": "3000.00",
+        "treatment_charges": "24000.00",
+        "appointments_limit": "20"
+    },
+    {
+        "name": "Pediatric Dermatology",
+        "department": 7,
+        "details": "Diagnosis and treatment of skin conditions affecting infants, children, and adolescents.",
+        "appointment_charges": "1500.00",
+        "treatment_charges": "9000.00",
+        "appointments_limit": "26"
+    },
+    {
+        "name": "Cosmetic Dermatology",
+        "department": 7,
+        "details": "Non-surgical cosmetic treatments to improve appearance and skin health.",
+        "appointment_charges": "2000.00",
+        "treatment_charges": "12000.00",
+        "appointments_limit": "22"
+    },
+    {
+        "name": "Dermatological Surgery",
+        "department": 7,
+        "details": "Surgical procedures for skin conditions and cancers.",
+        "appointment_charges": "2500.00",
+        "treatment_charges": "18000.00",
+        "appointments_limit": "19"
+    },
+    {
+        "name": "Dermatopathology",
+        "department": 7,
+        "details": "Diagnosis of skin diseases through microscopic examination of skin samples.",
+        "appointment_charges": "2200.00",
+        "treatment_charges": "14000.00",
+        "appointments_limit": "18"
+    },
+    {
+        "name": "Laser Dermatology",
+        "department": 7,
+        "details": "Use of laser technology for various skin treatments and conditions.",
+        "appointment_charges": "1800.00",
+        "treatment_charges": "11000.00",
+        "appointments_limit": "23"
+    },
+    {
+        "name": "Psoriasis Treatment",
+        "department": 7,
+        "details": "Specialized care for psoriasis patients, including medication and light therapy.",
+        "appointment_charges": "1600.00",
+        "treatment_charges": "10000.00",
+        "appointments_limit": "24"
+    },
+    {
+        "name": "Sports Medicine",
+        "department": 8,
+        "details": "Treatment of sports-related injuries and prevention of future issues.",
+        "appointment_charges": "2800.00",
+        "treatment_charges": "20000.00",
+        "appointments_limit": "21"
+    },
+    {
+        "name": "Rheumatology",
+        "department": 8,
+        "details": "Diagnosis and management of rheumatic diseases such as arthritis.",
+        "appointment_charges": "2600.00",
+        "treatment_charges": "18000.00",
+        "appointments_limit": "22"
+    },
+    {
+        "name": "Physical Therapy",
+        "department": 8,
+        "details": "Exercise programs and manual therapy to improve mobility and strength.",
+        "appointment_charges": "2300.00",
+        "treatment_charges": "15000.00",
+        "appointments_limit": "25"
+    },
+    {
+        "name": "Orthopedic Rehabilitation",
+        "department": 8,
+        "details": "Post-operative care and recovery programs for orthopedic patients.",
+        "appointment_charges": "2000.00",
+        "treatment_charges": "12000.00",
+        "appointments_limit": "26"
+    },
+    {
+        "name": "Bone Density Testing",
+        "department": 8,
+        "details": "Non-invasive tests to assess bone health and density.",
+        "appointment_charges": "1800.00",
+        "treatment_charges": "9000.00",
+        "appointments_limit": "27"
+    },
+    {
+        "name": "Gastrointestinal Endoscopy",
+        "department": 9,
+        "details": "Diagnostic and therapeutic procedures for gastrointestinal tract disorders.",
+        "appointment_charges": "3200.00",
+        "treatment_charges": "25000.00",
+        "appointments_limit": "18"
+    },
+    {
+        "name": "Liver Disease Management",
+        "department": 9,
+        "details": "Treatment of liver conditions such as hepatitis, cirrhosis, and liver cancer.",
+        "appointment_charges": "2900.00",
+        "treatment_charges": "22000.00",
+        "appointments_limit": "19"
+    },
+    {
+        "name": "Pancreatic Disorders Treatment",
+        "department": 9,
+        "details": "Management of pancreatic conditions like pancreatitis and pancreatic cancer.",
+        "appointment_charges": "2700.00",
+        "treatment_charges": "20000.00",
+        "appointments_limit": "20"
+    },
+    {
+        "name": "Inflammatory Bowel Disease (IBD)",
+        "department": 9,
+        "details": "Treatment of conditions like Crohn's disease and ulcerative colitis.",
+        "appointment_charges": "2500.00",
+        "treatment_charges": "18000.00",
+        "appointments_limit": "21"
+    },
+    {
+        "name": "Nutrition Counseling",
+        "department": 9,
+        "details": "Dietary advice for digestive health and weight management.",
+        "appointment_charges": "2200.00",
+        "treatment_charges": "14000.00",
+        "appointments_limit": "24"
+    },
+    {
+        "name": "Gastrointestinal Motility Studies",
+        "department": 9,
+        "details": "Tests to evaluate muscle contractions in the digestive tract.",
+        "appointment_charges": "1900.00",
+        "treatment_charges": "10000.00",
+        "appointments_limit": "25"
+    },
+    {
+        "name": "Kidney Transplant",
+        "department": 10,
+        "details": "Surgical procedure to replace a diseased kidney with a healthy one.",
+        "appointment_charges": "1500.00",
+        "treatment_charges": "80000.00",
+        "appointments_limit": "10"
+    },
+    {
+        "name": "Dialysis Unit",
+        "department": 10,
+        "details": "Treatment for patients with end-stage renal disease using dialysis machines.",
+        "appointment_charges": "1000.00",
+        "treatment_charges": "5000.00",
+        "appointments_limit": "30"
+    },
+    {
+        "name": "Nephrotic Syndrome Treatment",
+        "department": 10,
+        "details": "Care for patients suffering from nephrotic syndrome, including medications and lifestyle changes.",
+        "appointment_charges": "1200.00",
+        "treatment_charges": "6000.00",
+        "appointments_limit": "20"
+    },
+    {
+        "name": "Polycystic Kidney Disease Management",
+        "department": 10,
+        "details": "Treatment and management of PKD, including medication and lifestyle adjustments.",
+        "appointment_charges": "900.00",
+        "treatment_charges": "7000.00",
+        "appointments_limit": "25"
+    },
+    {
+        "name": "Kidney Stone Removal",
+        "department": 10,
+        "details": "Minimally invasive procedures to remove kidney stones.",
+        "appointment_charges": "1800.00",
+        "treatment_charges": "12000.00",
+        "appointments_limit": "15"
+    },
+    {
+        "name": "Glomerulonephritis Treatment",
+        "department": 10,
+        "details": "Care for patients with glomerulonephritis, including immunosuppressive therapy.",
+        "appointment_charges": "1300.00",
+        "treatment_charges": "9000.00",
+        "appointments_limit": "18"
+    },
+    {
+        "name": "Prenatal Care",
+        "department": 11,
+        "details": "Regular check-ups and monitoring during pregnancy.",
+        "appointment_charges": "1800.00",
+        "treatment_charges": "15000.00",
+        "appointments_limit": "30"
+    },
+    {
+        "name": "Maternal-Fetal Medicine",
+        "department": 11,
+        "details": "High-risk pregnancy management and fetal monitoring.",
+        "appointment_charges": "2200.00",
+        "treatment_charges": "25000.00",
+        "appointments_limit": "20"
+    },
+    {
+        "name": "Gynecologic Surgery",
+        "department": 11,
+        "details": "Surgical procedures for gynecological conditions.",
+        "appointment_charges": "1900.00",
+        "treatment_charges": "28000.00",
+        "appointments_limit": "22"
+    },
+    {
+        "name": "Reproductive Endocrinology",
+        "department": 11,
+        "details": "Treatment of hormonal disorders affecting reproduction.",
+        "appointment_charges": "2100.00",
+        "treatment_charges": "23000.00",
+        "appointments_limit": "23"
+    },
+    {
+        "name": "Urogynecology",
+        "department": 11,
+        "details": "Treatment of pelvic floor disorders and urinary incontinence.",
+        "appointment_charges": "2000.00",
+        "treatment_charges": "20000.00",
+        "appointments_limit": "24"
+    },
+    {
+        "name": "Minimally Invasive Gynecologic Surgery",
+        "department": 11,
+        "details": "Advanced surgical techniques for gynecological procedures.",
+        "appointment_charges": "2300.00",
+        "treatment_charges": "30000.00",
+        "appointments_limit": "21"
+    }
+]

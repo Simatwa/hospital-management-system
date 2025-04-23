@@ -24,13 +24,14 @@ from django.utils.translation import gettext
 from django.utils.translation import gettext_lazy as _
 from django.views.decorators.csrf import csrf_protect
 from django.views.decorators.debug import sensitive_post_parameters
+from hospital_ms.utils.admin import DevelopmentImportExportModelAdmin
 
 csrf_protect_m = method_decorator(csrf_protect)
 sensitive_post_parameters_m = method_decorator(sensitive_post_parameters())
 
 
 @admin.register(CustomUser)
-class CustomUserAdmin(admin.ModelAdmin):
+class CustomUserAdmin(DevelopmentImportExportModelAdmin):
     form = UserChangeForm
     add_form = AdminUserCreationForm
     change_user_password_template = None

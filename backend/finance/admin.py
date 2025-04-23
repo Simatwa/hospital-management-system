@@ -4,11 +4,11 @@ from django.contrib import admin
 from finance.models import Account, UserAccount, Payment, ExtraFee
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
-from import_export.admin import ImportExportModelAdmin
+from hospital_ms.utils.admin import DevelopmentImportExportModelAdmin
 
 
 @admin.register(Account)
-class AccountAdmin(ImportExportModelAdmin):
+class AccountAdmin(DevelopmentImportExportModelAdmin):
     list_display = (
         "name",
         "paybill_number",
@@ -22,7 +22,7 @@ class AccountAdmin(ImportExportModelAdmin):
 
 
 @admin.register(UserAccount)
-class UserAccountAdmin(ImportExportModelAdmin):
+class UserAccountAdmin(DevelopmentImportExportModelAdmin):
     list_display = ("user", "balance", "created_at", "updated_at")
     search_fields = (
         "user",
@@ -42,7 +42,7 @@ class UserAccountAdmin(ImportExportModelAdmin):
 
 
 @admin.register(Payment)
-class PaymentAdmin(ImportExportModelAdmin):
+class PaymentAdmin(DevelopmentImportExportModelAdmin):
     list_display = ("user", "amount", "method", "reference", "created_at")
     search_fields = ("user", "reference", "method")
     list_filter = ("user", "method", "created_at")
@@ -57,7 +57,7 @@ class PaymentAdmin(ImportExportModelAdmin):
 
 
 @admin.register(ExtraFee)
-class ExtraFeeAdmin(ImportExportModelAdmin):
+class ExtraFeeAdmin(DevelopmentImportExportModelAdmin):
     def total_treatments_charged(self, obj: ExtraFee) -> int:
         return obj.treatments.filter(created_at__date=timezone.now().date()).count()
 

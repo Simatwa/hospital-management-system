@@ -1,0 +1,26 @@
+[
+    {
+        "title": "Hospital Introduces Blue-Themed Recovery Rooms for Enhanced Healing",
+        "category": "General",
+        "content": "<p>Our hospital has launched a new initiative to improve patient recovery environments. Select recovery rooms are now redesigned with a calming blue theme, featuring soft blue walls, ambient lighting, and ocean-inspired art. Studies show that cool color tones can help reduce stress and promote faster healing.</p>",
+        "summary": "Blue-themed recovery rooms are now available, aiming to create a soothing environment that supports patient healing.",
+        "is_published": "1",
+        "views": "376"
+    },
+    {
+        "title": "Spring Health Advisory: Seasonal Allergies and How to Stay Safe",
+        "category": "Health",
+        "content": "<p>As pollen levels rise this spring, our health experts advise patients to take precautions against seasonal allergies. Common symptoms include sneezing, congestion, and itchy eyes. We recommend staying indoors during peak hours, using air purifiers, and consulting with our ENT specialists for personalized care plans.</p>",
+        "summary": "The hospital offers advice and treatment for seasonal allergies as spring brings a rise in pollen levels.",
+        "is_published": "1",
+        "views": "289"
+    },
+    {
+        "title": "New Outpatient Wing Now Open – Book Appointments Online",
+        "category": "Announcements",
+        "content": "<p>We are proud to announce the opening of our new outpatient services wing. Designed for efficiency and patient comfort, the facility includes modern consultation rooms, quick diagnostic labs, and a digital check-in system. Patients can now book appointments through our website or mobile app.</p>",
+        "summary": "The hospital has opened a new outpatient wing, now accepting online bookings for faster, more convenient service.",
+        "is_published": "1",
+        "views": "353"
+    }
+]

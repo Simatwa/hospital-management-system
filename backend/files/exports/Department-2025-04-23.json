@@ -1,0 +1,68 @@
+[
+    {
+        "id": "11",
+        "name": "Obstetrics and Gynecology",
+        "lead": "",
+        "details": "Covers women's reproductive health and pregnancy-related care"
+    },
+    {
+        "id": "10",
+        "name": "Nephrology",
+        "lead": "",
+        "details": "Focuses on kidney function and related disorders"
+    },
+    {
+        "id": "9",
+        "name": "Gastroenterology",
+        "lead": "",
+        "details": "Diagnoses and treats digestive system disorders"
+    },
+    {
+        "id": "8",
+        "name": "Orthopedics",
+        "lead": "",
+        "details": "Specializes in musculoskeletal disorders and surgical procedures"
+    },
+    {
+        "id": "7",
+        "name": "Dermatology",
+        "lead": "",
+        "details": "Concerned with skin, hair, and nail disorders"
+    },
+    {
+        "id": "6",
+        "name": "Psychiatry",
+        "lead": "",
+        "details": "Treats mental health disorders and provides psychological counseling"
+    },
+    {
+        "id": "5",
+        "name": "Pediatrics",
+        "lead": "",
+        "details": "Provides medical care for infants, children, and adolescents"
+    },
+    {
+        "id": "4",
+        "name": "Oncology",
+        "lead": "",
+        "details": "Deals with cancer diagnosis, treatment, and management"
+    },
+    {
+        "id": "3",
+        "name": "Neurology",
+        "lead": "",
+        "details": "Focuses on disorders and diseases affecting the brain, spinal cord, and nervous system"
+    },
+    {
+        "id": "2",
+        "name": "Cardiology",
+        "lead": "",
+        "details": "Specializes in diagnosing and treating heart conditions"
+    },
+    {
+        "id": "1",
+        "name": "Accidents & Emergency",
+        "lead": "",
+        "details": "Responsible for accidents and emergency attentions"
+    }
+]

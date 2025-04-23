@@ -1,0 +1,64 @@
+
+[
+    {
+      "sender": 14,
+      "message": "Dr. Smith was very attentive during my appointment. She explained everything clearly and made sure I understood my treatment plan.",
+      "rate": "Excellent",
+      "show_in_index": "1"
+    },
+    {
+      "sender": 15,
+      "message": "The waiting room was clean and comfortable. The nurse who took my vitals was friendly and efficient.",
+      "rate": "Good",
+      "show_in_index": "1"
+    },
+    {
+      "sender": 16,
+      "message": "My doctor listened carefully to my concerns and offered helpful advice. However, the office seemed a bit disorganized.",
+      "rate": "Average",
+      "show_in_index": "1"
+    },
+    {
+      "sender": 17,
+      "message": "Unfortunately, my appointment ran significantly behind schedule. This caused me to be late for another commitment.",
+      "rate": "Poor",
+      "show_in_index": "1"
+    },
+    {
+      "sender": 18,
+      "message": "I was very dissatisfied with my experience. The doctor seemed rushed and didn't address all my questions.",
+      "rate": "Terrible",
+      "show_in_index": "1"
+    },
+    {
+      "sender": 19,
+      "message": "The staff was friendly and welcoming. However, the exam room could have been cleaner.",
+      "rate": "Excellent",
+      "show_in_index": "1"
+    },
+    {
+      "sender": 20,
+      "message": "I appreciated the doctor's willingness to explain things in detail. The receptionist was also very helpful with scheduling.",
+      "rate": "Good",
+      "show_in_index": "1"
+    },
+    {
+      "sender": 21,
+      "message": "My appointment went smoothly, but I felt like I didn't get as much time with the doctor as I needed.",
+      "rate": "Average",
+      "show_in_index": "1"
+    },
+    {
+      "sender": 22,
+      "message": "The office was easy to find and park at. Unfortunately, the nurse who took my blood pressure seemed a bit inexperienced.",
+      "rate": "Poor",
+      "show_in_index": "1"
+    },
+    {
+      "sender": 23,
+      "message": "I was extremely satisfied with my care. The doctor was knowledgeable and addressed all my concerns thoroughly.",
+      "rate": "Terrible",
+      "show_in_index": "1"
+    }
+  ]
+  

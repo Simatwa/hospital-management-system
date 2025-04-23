@@ -1,0 +1,226 @@
+[
+    {
+        "user": 1,
+        "speciality": 51,
+        "working_days": "1,3,4,5,6,7",
+        "shift": "Night",
+        "salary": "50000.00"
+    },
+    {
+        "user": 2,
+        "speciality": 51,
+        "working_days": "2,3,4,5,7",
+        "shift": "Day",
+        "salary": "50500.00"
+    },
+    {
+        "user": 3,
+        "speciality": 52,
+        "working_days": "1,2,3,4,5,7",
+        "shift": "Night",
+        "salary": "51000.00"
+    },
+    {
+        "user": 4,
+        "speciality": 52,
+        "working_days": "2,3,4,5,6,7",
+        "shift": "Day",
+        "salary": "51500.00"
+    },
+    {
+        "user": 5,
+        "speciality": 53,
+        "working_days": "1,3,4,5,6,7",
+        "shift": "Night",
+        "salary": "52000.00"
+    },
+    {
+        "user": 6,
+        "speciality": 53,
+        "working_days": "2,3,4,5,7",
+        "shift": "Day",
+        "salary": "52500.00"
+    },
+    {
+        "user": 7,
+        "speciality": 54,
+        "working_days": "1,2,3,4,5,7",
+        "shift": "Night",
+        "salary": "53000.00"
+    },
+    {
+        "user": 8,
+        "speciality": 54,
+        "working_days": "2,3,4,5,6,7",
+        "shift": "Day",
+        "salary": "53500.00"
+    },
+    {
+        "user": 9,
+        "speciality": 55,
+        "working_days": "1,3,4,5,6,7",
+        "shift": "Night",
+        "salary": "54000.00"
+    },
+    {
+        "user": 10,
+        "speciality": 55,
+        "working_days": "2,3,4,5,7",
+        "shift": "Day",
+        "salary": "54500.00"
+    },
+    {
+        "user": 11,
+        "speciality": 55,
+        "working_days": "2,3,4,5,7",
+        "shift": "Day",
+        "salary": "54500.00"
+    },
+    {
+        "user": 12,
+        "speciality": 56,
+        "working_days": "2,3,4,5,7",
+        "shift": "Day",
+        "salary": "54500.00"
+    },
+    {
+        "user": 13,
+        "speciality": 56,
+        "working_days": "2,3,4,5,7",
+        "shift": "Day",
+        "salary": "54500.00"
+    },
+    {
+        "user": 14,
+        "speciality": 57,
+        "working_days": "2,3,4,5,7",
+        "shift": "Day",
+        "salary": "54500.00"
+    },
+    {
+        "user": 15,
+        "speciality": 57,
+        "working_days": "2,3,4,5,7",
+        "shift": "Day",
+        "salary": "54500.00"
+    },
+    {
+        "user": 16,
+        "speciality": 8,
+        "working_days": "2,3,4,5,7",
+        "shift": "Day",
+        "salary": "54500.00"
+    },
+    {
+        "user": 17,
+        "speciality": 8,
+        "working_days": "2,3,4,5,7",
+        "shift": "Day",
+        "salary": "54500.00"
+    },
+    {
+        "user": 18,
+        "speciality": 9,
+        "working_days": "2,3,4,5,7",
+        "shift": "Day",
+        "salary": "54500.00"
+    },
+    {
+        "user": 19,
+        "speciality": 9,
+        "working_days": "2,3,4,5,7",
+        "shift": "Day",
+        "salary": "54500.00"
+    },
+    {
+        "user": 20,
+        "speciality": 10,
+        "working_days": "2,3,4,5,7",
+        "shift": "Day",
+        "salary": "54500.00"
+    },
+    {
+        "user": 21,
+        "speciality": 10,
+        "working_days": "2,3,4,5,7",
+        "shift": "Day",
+        "salary": "54500.00"
+    },
+    {
+        "user": 22,
+        "speciality": 11,
+        "working_days": "2,3,4,5,7",
+        "shift": "Day",
+        "salary": "54500.00"
+    },
+    {
+        "user": 23,
+        "speciality": 11,
+        "working_days": "2,3,4,5,7",
+        "shift": "Day",
+        "salary": "54500.00"
+    },
+    {
+        "user": 24,
+        "speciality": 12,
+        "working_days": "2,3,4,5,7",
+        "shift": "Day",
+        "salary": "54500.00"
+    },
+    {
+        "user": 25,
+        "speciality": 12,
+        "working_days": "2,3,4,5,7",
+        "shift": "Day",
+        "salary": "54500.00"
+    },
+    {
+        "user": 26,
+        "speciality": 13,
+        "working_days": "2,3,4,5,7",
+        "shift": "Day",
+        "salary": "54500.00"
+    },
+    {
+        "user": 27,
+        "speciality": 13,
+        "working_days": "2,3,4,5,7",
+        "shift": "Day",
+        "salary": "54500.00"
+    },
+    {
+        "user": 28,
+        "speciality": 14,
+        "working_days": "2,3,4,5,7",
+        "shift": "Day",
+        "salary": "54500.00"
+    },
+    {
+        "user": 29,
+        "speciality": 14,
+        "working_days": "2,3,4,5,7",
+        "shift": "Day",
+        "salary": "54500.00"
+    },
+    {
+        "user": 30,
+        "speciality": 15,
+        "working_days": "2,3,4,5,7",
+        "shift": "Day",
+        "salary": "54500.00"
+    },
+    {
+        "user": 31,
+        "speciality": 15,
+        "working_days": "2,3,4,5,7",
+        "shift": "Day",
+        "salary": "54500.00"
+    },
+    {
+        "user": 32,
+        "speciality": 16,
+        "working_days": "2,3,4,5,7",
+        "shift": "Day",
+        "salary": "54500.00"
+    }
+]

@@ -22,6 +22,7 @@ class CustomUser(AbstractUser):
 
     class UserRole(Enum):
         PATIENT = "Patient"
+        NURSE = "Nurse"
         DOCTOR = "Doctor"
         ADMIN = "Admin"
 

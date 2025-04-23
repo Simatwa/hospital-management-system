@@ -1,12 +1,13 @@
 from django.contrib import admin
 from external.models import About, ServiceFeedback, Gallery, News, Subscriber
 from django.utils.translation import gettext_lazy as _
+from hospital_ms.utils.admin import DevelopmentImportExportModelAdmin
 
 # Register your models here.
 
 
 @admin.register(About)
-class AboutAdmin(admin.ModelAdmin):
+class AboutAdmin(DevelopmentImportExportModelAdmin):
     list_display = ("name", "short_name", "founded_in", "founder_name", "updated_at")
     fieldsets = (
         (None, {"fields": ("name", "short_name", "slogan", "details")}),
@@ -52,7 +53,7 @@ class AboutAdmin(admin.ModelAdmin):
 
 
 @admin.register(ServiceFeedback)
-class ServiceFeedbackAdmin(admin.ModelAdmin):
+class ServiceFeedbackAdmin(DevelopmentImportExportModelAdmin):
     list_display = ("sender", "rate", "show_in_index", "updated_at", "created_at")
     search_fields = ("sender__username", "message")
     list_filter = ("rate", "show_in_index", "updated_at", "created_at")
@@ -60,7 +61,7 @@ class ServiceFeedbackAdmin(admin.ModelAdmin):
 
 
 @admin.register(Gallery)
-class GalleryAdmin(admin.ModelAdmin):
+class GalleryAdmin(DevelopmentImportExportModelAdmin):
     list_display = ("title", "picture", "show_in_index", "date", "updated_at")
     search_fields = ("title",)
     list_filter = ("date", "created_at")
@@ -73,7 +74,7 @@ class GalleryAdmin(admin.ModelAdmin):
 
 
 @admin.register(News)
-class NewsAdmin(admin.ModelAdmin):
+class NewsAdmin(DevelopmentImportExportModelAdmin):
     list_display = ("title", "category", "is_published", "views", "created_at")
     list_filter = ("category", "created_at", "updated_at", "views")
     search_fields = ("title", "summary")
@@ -97,7 +98,7 @@ class NewsAdmin(admin.ModelAdmin):
 
 
 @admin.register(Subscriber)
-class SubscriberAdmin(admin.ModelAdmin):
+class SubscriberAdmin(DevelopmentImportExportModelAdmin):
     list_display = (
         "email",
         "is_verified",

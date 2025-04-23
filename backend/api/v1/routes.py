@@ -243,7 +243,9 @@ def add_subscription(
 @router.get("/feedbacks", name="Get user's feedbacks")
 def get_users_feedbacks() -> list[UserFeedback]:
     feedback_list = []
-    for feedback in ServiceFeedback.objects.filter(show_in_index=True).all():
+    for feedback in (
+        ServiceFeedback.objects.filter(show_in_index=True).all().order_by("-created_at")
+    ):
         user_feedback = jsonable_encoder(feedback)
         user_feedback["user"] = jsonable_encoder(feedback.sender)
         feedback_list.append(user_feedback)
@@ -292,12 +294,21 @@ def get_doctors_available(
     if at:
         day_of_week, work_shift = get_day_and_shift(at)
         doctors = Doctor.objects.filter(
-            working_days__name=day_of_week, shift=work_shift, id__gt=offset
+            working_days__name=day_of_week,
+            shift=work_shift,
+            id__gt=offset,
+            speciality__isnull=False,
         )
     else:
-        doctors = Doctor.objects.filter(id__gt=offset)
+        doctors = Doctor.objects.filter(
+            id__gt=offset,
+            speciality__isnull=False,
+        )
     if speciality_name:
-        doctors = doctors.filter(speciality__name=speciality_name)
+        doctors = doctors.filter(
+            speciality__name=speciality_name,
+            speciality__isnull=False,
+        )
     available_doctors_list: list[AvailableDoctor] = []
     for doctor in doctors[:limit]:
         available_doctors_list.append(

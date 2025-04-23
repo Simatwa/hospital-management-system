@@ -8,12 +8,13 @@ from hospital.models import (
 )
 
 from django.utils.translation import gettext_lazy as _
+from hospital_ms.utils.admin import DevelopmentImportExportModelAdmin
 
 # Register your models here.
 
 
 @admin.register(Medicine)
-class MedicineAdmin(admin.ModelAdmin):
+class MedicineAdmin(DevelopmentImportExportModelAdmin):
     list_display = (
         "name",
         "short_name",
@@ -29,7 +30,7 @@ class MedicineAdmin(admin.ModelAdmin):
 
 
 @admin.register(Patient)
-class PatientAdmin(admin.ModelAdmin):
+class PatientAdmin(DevelopmentImportExportModelAdmin):
     search_fields = ("user__username",)
     list_filter = ("created_at",)
 
@@ -47,14 +48,14 @@ class PatientAdmin(admin.ModelAdmin):
 
 
 @admin.register(TreatmentMedicine)
-class TreatmentMedicineAdmin(admin.ModelAdmin):
+class TreatmentMedicineAdmin(DevelopmentImportExportModelAdmin):
     list_display = ("medicine", "quantity", "prescription", "updated_at", "created_at")
     search_fields = ("medicine__name",)
     list_filter = ("updated_at", "created_at")
 
 
 @admin.register(Treatment)
-class TreatmentAdmin(admin.ModelAdmin):
+class TreatmentAdmin(DevelopmentImportExportModelAdmin):
     def active_doctors(self, obj: Treatment):
         return obj.doctors.count()
 
@@ -92,7 +93,7 @@ class TreatmentAdmin(admin.ModelAdmin):
 
 
 @admin.register(Appointment)
-class AppointmentAdmin(admin.ModelAdmin):
+class AppointmentAdmin(DevelopmentImportExportModelAdmin):
     list_display = (
         "patient",
         "doctor",

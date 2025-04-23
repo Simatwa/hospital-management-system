@@ -11,7 +11,11 @@ from django.utils import timezone
 class Department(models.Model):
     name = models.CharField(max_length=30, unique=True, help_text=_("Department name"))
     lead = models.OneToOneField(
-        "users.CustomUser", on_delete=models.RESTRICT, help_text=_("Head of department")
+        "users.CustomUser",
+        on_delete=models.SET_NULL,
+        help_text=_("Head of department"),
+        null=True,
+        blank=True,
     )
     details = models.TextField(
         null=True, blank=True, help_text=_("Information related to this department.")
@@ -122,7 +126,9 @@ class Doctor(models.Model):
     )
     speciality = models.ForeignKey(
         Speciality,
-        on_delete=models.RESTRICT,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
         help_text=_("The doctor's speciality"),
         related_name="doctors",
     )
