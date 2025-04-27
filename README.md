@@ -54,7 +54,7 @@ source venv/bin/activate # *nix
 pip install -r requirements.txt
 
 # Set up Django database
-python manage.py makemigrations users hospital
+python manage.py makemigrations users hospital finance external staffing
 python manage.py migrate
 python manage.py collectstatic
 
