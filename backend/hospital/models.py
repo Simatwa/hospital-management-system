@@ -307,6 +307,7 @@ class Appointment(models.Model):
         "external.ServiceFeedback",
         help_text=_("Appointment service feedback"),
         related_name="appointments",
+        blank=True,
     )
     updated_at = models.DateTimeField(
         auto_now=True,
